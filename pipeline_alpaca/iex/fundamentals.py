@@ -1,9 +1,11 @@
 import numpy as np
+
 from zipline.utils.numpy_utils import (
     object_dtype, datetime64D_dtype, float64_dtype,
 )
-from .dataset import Column, DataSet
+from zipline.pipeline.data.dataset import Column, DataSet
 
+from .fundamentals_loader import IEXKeyStatsLoader
 
 class IEXKeyStats(DataSet):
 
@@ -22,8 +24,7 @@ class IEXKeyStats(DataSet):
   "latestEPS": 8.29,
   "latestEPSDate": "2016-09-30",
   "sharesOutstanding": 5213840000,
-  "float": 5203997571,
-  "returnOnEquity": 0.08772939519857577,
+  "float": 5203997571, "returnOnEquity": 0.08772939519857577,
   "consensusEPS": 3.22,
   "numberOfEstimates": 15,
   "symbol": "AAPL",
@@ -114,3 +115,7 @@ class IEXKeyStats(DataSet):
     month3ChangePercent = Column(float64_dtype, missing_value=np.nan)
     month1ChangePercent = Column(float64_dtype, missing_value=np.nan)
     day5ChangePercent = Column(float64_dtype, missing_value=np.nan)
+
+
+    def get_loader(self):
+        return IEXKeyStatsLoader()

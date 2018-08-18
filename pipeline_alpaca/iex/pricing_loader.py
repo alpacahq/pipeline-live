@@ -1,37 +1,13 @@
-# Copyright 2015 Quantopian, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-from numpy import (
-    iinfo,
-    uint32,
-)
-
 import concurrent.futures
-import numpy as np
 
 import iexfinance
+import numpy as np
 import pandas as pd
-from zipline.data.us_equity_pricing import (
-    BcolzDailyBarReader,
-    SQLiteAdjustmentReader,
-)
+
 from zipline.lib.adjusted_array import AdjustedArray
-from zipline.errors import NoFurtherDataError
+from zipline.pipeline.loaders.base import PipelineLoader
 from zipline.utils.calendars import get_calendar
-
-from .base import PipelineLoader
-
-UINT32_MAX = iinfo(uint32).max
+from zipline.errors import NoFurtherDataError
 
 
 def get_stockprices(symbols, chart_range='1y'):
@@ -52,7 +28,7 @@ def get_stockprices(symbols, chart_range='1y'):
         return result
 
     result = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=25) as executor:
         tasks = []
         partlen = 99
         for i in range(0, len(symbols), partlen):
@@ -78,17 +54,14 @@ def get_stockprices(symbols, chart_range='1y'):
 class USEquityPricingLoader(PipelineLoader):
     """
     PipelineLoader for US Equity Pricing data
-
-    Delegates loading of baselines and adjustments.
     """
 
-    def __init__(self, asset_finder):
-        self._asset_finder = asset_finder
+    def __init__(self):
         cal = get_calendar('NYSE')
 
         self._all_sessions = cal.all_sessions
 
-    def load_adjusted_array(self, columns, dates, assets, mask):
+    def load_adjusted_array(self, columns, dates, symbols, mask):
         # load_adjusted_array is called with dates on which the user's algo
         # will be shown data, which means we need to return the data that would
         # be known at the start of each date.  We assume that the latest data
@@ -104,13 +77,9 @@ class USEquityPricingLoader(PipelineLoader):
         iex_symbols = [
             symbol['symbol'] for symbol in iexfinance.get_available_symbols()
         ]
-        asset_finder = self._asset_finder
-        asset_symbols = [
-            a.symbol for a in asset_finder.retrieve_all(assets)
-        ]
-        symbols = list(set(iex_symbols) & set(asset_symbols))
+        input_symbols = symbols
+        symbols = list(set(iex_symbols) & set(input_symbols))
         print('len(symbols) = {}'.format(len(symbols)))
-        # TODO: dynamic "range"
         chart_range = '1m'
         timedelta = pd.Timestamp.utcnow() - start_date
         if timedelta > pd.Timedelta('730 days'):
@@ -127,7 +96,7 @@ class USEquityPricingLoader(PipelineLoader):
         prices = get_stockprices(symbols, chart_range=chart_range)
 
         dfs = []
-        for symbol in asset_symbols:
+        for symbol in symbols:
             if symbol not in prices:
                 df = pd.DataFrame(
                     {c.name: c.missing_value for c in columns},
@@ -149,7 +118,6 @@ class USEquityPricingLoader(PipelineLoader):
             c_raw = raw_arrays[c.name]
             out[c] = AdjustedArray(
                 c_raw.astype(c.dtype),
-                mask,
                 {},
                 c.missing_value
             )

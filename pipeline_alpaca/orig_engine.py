@@ -1,19 +1,23 @@
+"""
+Compute Engine definitions for the Pipeline API.
+"""
+from abc import (
+    ABCMeta,
+    abstractmethod,
+)
 from uuid import uuid4
-from numpy import array
-import pandas as pd
-from pandas import DataFrame, MultiIndex
+
 from six import (
     iteritems,
     with_metaclass,
 )
+from numpy import array
+from pandas import DataFrame, MultiIndex
 from toolz import groupby, juxt
 from toolz.curried.operator import getitem
 
 from zipline.lib.adjusted_array import ensure_adjusted_array, ensure_ndarray
 from zipline.errors import NoFurtherDataError
-from zipline.pipeline.engine import default_populate_initial_workspace
-from zipline.pipeline.term import AssetExists, InputDates, LoadableTerm
-from zipline.utils.calendars import get_calendar
 from zipline.utils.numpy_utils import (
     as_column,
     repeat_first_axis,
@@ -21,16 +25,138 @@ from zipline.utils.numpy_utils import (
 )
 from zipline.utils.pandas_utils import explode
 
-class LivePipelineEngine(object):
+from .term import AssetExists, InputDates, LoadableTerm
+
+
+class PipelineEngine(with_metaclass(ABCMeta)):
+
+    @abstractmethod
+    def run_pipeline(self, pipeline, start_date, end_date):
+        """
+        Compute values for `pipeline` between `start_date` and `end_date`.
+
+        Returns a DataFrame with a MultiIndex of (date, asset) pairs.
+
+        Parameters
+        ----------
+        pipeline : zipline.pipeline.Pipeline
+            The pipeline to run.
+        start_date : pd.Timestamp
+            Start date of the computed matrix.
+        end_date : pd.Timestamp
+            End date of the computed matrix.
+
+        Returns
+        -------
+        result : pd.DataFrame
+            A frame of computed results.
+
+            The columns `result` correspond to the entries of
+            `pipeline.columns`, which should be a dictionary mapping strings to
+            instances of `zipline.pipeline.term.Term`.
+
+            For each date between `start_date` and `end_date`, `result` will
+            contain a row for each asset that passed `pipeline.screen`.  A
+            screen of None indicates that a row should be returned for each
+            asset that existed each day.
+        """
+        raise NotImplementedError("run_pipeline")
+
+
+class NoEngineRegistered(Exception):
+    """
+    Raised if a user tries to call pipeline_output in an algorithm that hasn't
+    set up a pipeline engine.
+    """
+
+
+class ExplodingPipelineEngine(PipelineEngine):
+    """
+    A PipelineEngine that doesn't do anything.
+    """
+    def run_pipeline(self, pipeline, start_date, end_date):
+        raise NoEngineRegistered(
+            "Attempted to run a pipeline but no pipeline "
+            "resources were registered."
+        )
+
+
+def default_populate_initial_workspace(initial_workspace,
+                                       root_mask_term,
+                                       execution_plan,
+                                       dates,
+                                       assets):
+    """The default implementation for ``populate_initial_workspace``. This
+    function returns the ``initial_workspace`` argument without making any
+    modifications.
+
+    Parameters
+    ----------
+    initial_workspace : dict[array-like]
+        The initial workspace before we have populated it with any cached
+        terms.
+    root_mask_term : Term
+        The root mask term, normally ``AssetExists()``. This is needed to
+        compute the dates for individual terms.
+    execution_plan : ExecutionPlan
+        The execution plan for the pipeline being run.
+    dates : pd.DatetimeIndex
+        All of the dates being requested in this pipeline run including
+        the extra dates for look back windows.
+    assets : pd.Int64Index
+        All of the assets that exist for the window being computed.
+
+    Returns
+    -------
+    populated_initial_workspace : dict[term, array-like]
+        The workspace to begin computations with.
+    """
+    return initial_workspace
+
+
+class SimplePipelineEngine(object):
+    """
+    PipelineEngine class that computes each term independently.
+
+    Parameters
+    ----------
+    get_loader : callable
+        A function that is given a loadable term and returns a PipelineLoader
+        to use to retrieve raw data for that term.
+    calendar : DatetimeIndex
+        Array of dates to consider as trading days when computing a range
+        between a fixed start and end.
+    asset_finder : zipline.assets.AssetFinder
+        An AssetFinder instance.  We depend on the AssetFinder to determine
+        which assets are in the top-level universe at any point in time.
+    populate_initial_workspace : callable, optional
+        A function which will be used to populate the initial workspace when
+        computing a pipeline. See
+        :func:`zipline.pipeline.engine.default_populate_initial_workspace`
+        for more info.
+
+    See Also
+    --------
+    :func:`zipline.pipeline.engine.default_populate_initial_workspace`
+    """
+    __slots__ = (
+        '_get_loader',
+        '_calendar',
+        '_finder',
+        '_root_mask_term',
+        '_root_mask_dates_term',
+        '_populate_initial_workspace',
+        '__weakref__',
+    )
 
     def __init__(self,
-                 list_symbols,
-                 calendar=None,
+                 get_loader,
+                 calendar,
+                 asset_finder,
                  populate_initial_workspace=None):
-        self._list_symbols = list_symbols
-        if calendar is None:
-            calendar = get_calendar('NYSE').all_sessions
+        self._get_loader = get_loader
         self._calendar = calendar
+        self._finder = asset_finder
 
         self._root_mask_term = AssetExists()
         self._root_mask_dates_term = InputDates()
@@ -39,18 +165,62 @@ class LivePipelineEngine(object):
             populate_initial_workspace or default_populate_initial_workspace
         )
 
-    def run_pipeline(self, pipeline):
-        now = pd.Timestamp.now(tz=self._calendar.tz)
-        today = pd.Timestamp(
-            year=now.year, month=now.month, day=now.day,
-            tz='utc')
+    def run_pipeline(self, pipeline, start_date, end_date):
+        """
+        Compute a pipeline.
 
-        end_date = self._calendar[self._calendar.get_loc(
-            today, method='ffill'
-        )]
-        start_date = end_date
+        Parameters
+        ----------
+        pipeline : zipline.pipeline.Pipeline
+            The pipeline to run.
+        start_date : pd.Timestamp
+            Start date of the computed matrix.
+        end_date : pd.Timestamp
+            End date of the computed matrix.
+
+        The algorithm implemented here can be broken down into the following
+        stages:
+
+        0. Build a dependency graph of all terms in `pipeline`.  Topologically
+           sort the graph to determine an order in which we can compute the
+           terms.
+
+        1. Ask our AssetFinder for a "lifetimes matrix", which should contain,
+           for each date between start_date and end_date, a boolean value for
+           each known asset indicating whether the asset existed on that date.
+
+        2. Compute each term in the dependency order determined in (0), caching
+           the results in a a dictionary to that they can be fed into future
+           terms.
+
+        3. For each date, determine the number of assets passing
+           pipeline.screen.  The sum, N, of all these values is the total
+           number of rows in our output frame, so we pre-allocate an output
+           array of length N for each factor in `terms`.
+
+        4. Fill in the arrays allocated in (3) by copying computed values from
+           our output cache into the corresponding rows.
+
+        5. Stick the values computed in (4) into a DataFrame and return it.
+
+        Step 0 is performed by ``Pipeline.to_graph``.
+        Step 1 is performed in ``SimplePipelineEngine._compute_root_mask``.
+        Step 2 is performed in ``SimplePipelineEngine.compute_chunk``.
+        Steps 3, 4, and 5 are performed in ``SimplePiplineEngine._to_narrow``.
+
+        See Also
+        --------
+        PipelineEngine.run_pipeline
+        """
+        if end_date < start_date:
+            raise ValueError(
+                "start_date must be before or equal to end_date \n"
+                "start_date=%s, end_date=%s" % (start_date, end_date)
+            )
+
         screen_name = uuid4().hex
-        graph = pipeline.to_execution_plan( screen_name,
+        graph = pipeline.to_execution_plan(
+            screen_name,
             self._root_mask_term,
             self._calendar,
             start_date,
@@ -112,7 +282,8 @@ class LivePipelineEngine(object):
             `end_date`.
         """
         calendar = self._calendar
-        start_idx, end_idx = calendar.slice_locs(start_date, end_date)
+        finder = self._finder
+        start_idx, end_idx = self._calendar.slice_locs(start_date, end_date)
         if start_idx < extra_rows:
             raise NoFurtherDataError.from_lookback_window(
                 initial_message="Insufficient data to compute Pipeline:",
@@ -123,10 +294,10 @@ class LivePipelineEngine(object):
 
         # Build lifetimes matrix reaching back to `extra_rows` days before
         # `start_date.`
-        symbols = self._list_symbols()
-        dates = calendar[start_idx - extra_rows:end_idx]
-        symbols = sorted(symbols)
-        lifetimes = pd.DataFrame(True, index=dates, columns=symbols)
+        lifetimes = finder.lifetimes(
+            calendar[start_idx - extra_rows:end_idx],
+            include_start_date=False
+        )
 
         assert lifetimes.index[extra_rows] == start_date
         assert lifetimes.index[-1] == end_date
@@ -180,7 +351,10 @@ class LivePipelineEngine(object):
                 out.append(input_data)
         return out
 
-    def compute_chunk(self, graph, dates, symbols, initial_workspace):
+    def get_loader(self, term):
+        return self._get_loader(term)
+
+    def compute_chunk(self, graph, dates, assets, initial_workspace):
         """
         Compute the Pipeline terms in the graph for the requested start and end
         dates.
@@ -190,12 +364,12 @@ class LivePipelineEngine(object):
         graph : zipline.pipeline.graph.TermGraph
         dates : pd.DatetimeIndex
             Row labels for our root mask.
-        symbols : list 
+        assets : pd.Int64Index
             Column labels for our root mask.
         initial_workspace : dict
             Map from term -> output.
             Must contain at least entry for `self._root_mask_term` whose shape
-            is `(len(dates), len(symbols))`, but may contain additional
+            is `(len(dates), len(assets))`, but may contain additional
             pre-computed terms for testing or optimization purposes.
 
         Returns
@@ -203,15 +377,15 @@ class LivePipelineEngine(object):
         results : dict
             Dictionary mapping requested results to outputs.
         """
-        self._validate_compute_chunk_params(dates, symbols, initial_workspace)
-        # get_loader = self.get_loader
+        self._validate_compute_chunk_params(dates, assets, initial_workspace)
+        get_loader = self.get_loader
 
         # Copy the supplied initial workspace so we don't mutate it in place.
         workspace = initial_workspace.copy()
 
         # If loadable terms share the same loader and extra_rows, load them all
         # together.
-        loader_group_key = juxt(lambda x: x, getitem(graph.extra_rows))
+        loader_group_key = juxt(get_loader, getitem(graph.extra_rows))
         loader_groups = groupby(loader_group_key, graph.loadable_terms)
 
         refcounts = graph.initial_refcounts(workspace)
@@ -238,16 +412,16 @@ class LivePipelineEngine(object):
                     loader_groups[loader_group_key(term)],
                     key=lambda t: t.dataset
                 )
-                loader = term.dataset.get_loader()
+                loader = get_loader(term)
                 loaded = loader.load_adjusted_array(
-                    to_load, mask_dates, symbols, mask,
+                    to_load, mask_dates, assets, mask,
                 )
                 workspace.update(loaded)
             else:
                 workspace[term] = term._compute(
                     self._inputs_for_term(term, workspace, graph),
                     mask_dates,
-                    symbols,
+                    assets,
                     mask,
                 )
                 if term.ndim == 2:
@@ -267,7 +441,7 @@ class LivePipelineEngine(object):
             out[name] = workspace[term][graph_extra_rows[term]:]
         return out
 
-    def _to_narrow(self, terms, data, mask, dates, symbols):
+    def _to_narrow(self, terms, data, mask, dates, assets):
         """
         Convert raw computed pipeline results into a DataFrame for public APIs.
 
@@ -281,8 +455,8 @@ class LivePipelineEngine(object):
             Mask array of values to keep.
         dates : ndarray[datetime64, ndim=1]
             Row index for arrays `data` and `mask`
-        symbols : list
-            Column index
+        assets : ndarray[int64, ndim=2]
+            Column index for arrays `data` and `mask`
 
         Returns
         -------
@@ -298,7 +472,6 @@ class LivePipelineEngine(object):
         If mask[date, asset] is True, then result.loc[(date, asset), colname]
         will contain the value of data[colname][date, asset].
         """
-        assert len(dates) == 1
         if not mask.any():
             # Manually handle the empty DataFrame case. This is a workaround
             # to pandas failing to tz_localize an empty dataframe with a
@@ -313,14 +486,12 @@ class LivePipelineEngine(object):
                     name: array([], dtype=arr.dtype)
                     for name, arr in iteritems(data)
                 },
-                index=pd.Index(empty_assets),
-                # index=MultiIndex.from_arrays([empty_dates, empty_assets]),
+                index=MultiIndex.from_arrays([empty_dates, empty_assets]),
             )
 
-        # resolved_assets = array(self._finder.retrieve_all(assets))
-        # dates_kept = repeat_last_axis(dates.values, len(symbols))[mask]
-        # assets_kept = repeat_first_axis(resolved_assets, len(dates))[mask]
-        assets_kept = repeat_first_axis(symbols, len(dates))[mask]
+        resolved_assets = array(self._finder.retrieve_all(assets))
+        dates_kept = repeat_last_axis(dates.values, len(assets))[mask]
+        assets_kept = repeat_first_axis(resolved_assets, len(dates))[mask]
 
         final_columns = {}
         for name in data:
@@ -333,11 +504,10 @@ class LivePipelineEngine(object):
 
         return DataFrame(
             data=final_columns,
-            index=pd.Index(assets_kept),
-            # index=MultiIndex.from_arrays([dates_kept, assets_kept]),
-        )
+            index=MultiIndex.from_arrays([dates_kept, assets_kept]),
+        ).tz_localize('UTC', level=0)
 
-    def _validate_compute_chunk_params(self, dates, symbols, initial_workspace):
+    def _validate_compute_chunk_params(self, dates, assets, initial_workspace):
         """
         Verify that the values passed to compute_chunk are well-formed.
         """
@@ -356,10 +526,10 @@ class LivePipelineEngine(object):
             )
 
         shape = initial_workspace[root].shape
-        implied_shape = len(dates), len(symbols)
+        implied_shape = len(dates), len(assets)
         if shape != implied_shape:
             raise AssertionError(
-                "root_mask shape is {shape}, but received dates/symbols "
+                "root_mask shape is {shape}, but received dates/assets "
                 "imply that shape should be {implied}".format(
                     shape=shape,
                     implied=implied_shape,
