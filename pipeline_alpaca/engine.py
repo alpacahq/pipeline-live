@@ -211,7 +211,7 @@ class LivePipelineEngine(object):
 
         # If loadable terms share the same loader and extra_rows, load them all
         # together.
-        loader_group_key = juxt(lambda x: x, getitem(graph.extra_rows))
+        loader_group_key = juxt(lambda x: x.dataset.get_loader(), getitem(graph.extra_rows))
         loader_groups = groupby(loader_group_key, graph.loadable_terms)
 
         refcounts = graph.initial_refcounts(workspace)
