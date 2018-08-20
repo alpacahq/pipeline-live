@@ -7,6 +7,7 @@ from zipline.pipeline.data.dataset import Column, DataSet
 
 from .fundamentals_loader import IEXKeyStatsLoader
 
+
 class IEXKeyStats(DataSet):
 
     '''
@@ -116,6 +117,8 @@ class IEXKeyStats(DataSet):
     month1ChangePercent = Column(float64_dtype, missing_value=np.nan)
     day5ChangePercent = Column(float64_dtype, missing_value=np.nan)
 
+    _loader = IEXKeyStatsLoader()
 
-    def get_loader(self):
-        return IEXKeyStatsLoader()
+    @classmethod
+    def get_loader(cls):
+        return cls._loader

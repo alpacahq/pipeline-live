@@ -61,8 +61,8 @@ def daily_cache(filename):
                         ret = pickle.load(fp)
                         if ret['digest'] == digest:
                             return ret['body']
-                        print('digest mismatch {} != {}'.format(
-                            ret['digest'], digest
+                        print('{}: digest mismatch {} != {}, reloading'.format(
+                            filepath, ret['digest'], digest
                         ))
                 except Exception as e:
                     print('cache error {}'.format(e))
