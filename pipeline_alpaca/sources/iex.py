@@ -11,21 +11,27 @@ def list_symbols():
     ]
 
 
-@daily_cache(filename='iex_key_stats.pkl')
 def key_stats():
+    all_symbols = list_symbols()
+    return _key_stats(all_symbols)
+
+
+@daily_cache(filename='iex_key_stats.pkl')
+def _key_stats(all_symbols):
     def fetch(symbols):
         return iexfinance.Stock(symbols).get_key_stats()
-
-    all_symbols = list_symbols()
 
     return parallelize(fetch, splitlen=99)(all_symbols)
 
 
-@daily_cache(filename='iex_financials.pkl')
 def financials():
+    all_symbols = list_symbols()
+    return _financials(all_symbols)
+
+
+@daily_cache(filename='iex_financials.pkl')
+def _financials(all_symbols):
     def fetch(symbols):
         return iexfinance.Stock(symbols).get_financials()
-
-    all_symbols = list_symbols()
 
     return parallelize(fetch, splitlen=99)(all_symbols)
