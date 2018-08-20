@@ -2,7 +2,9 @@ import numpy as np
 from zipline.utils.numpy_utils import (
     object_dtype, datetime64D_dtype, float64_dtype,
 )
-from .dataset import Column, DataSet
+from zipline.pipeline.data.dataset import Column, DataSet
+
+from .fundamentals_loader import PolygonCompanyLoader
 
 
 class PolygonCompany(DataSet):
@@ -48,3 +50,9 @@ class PolygonCompany(DataSet):
     phone = Column(object_dtype)
     ceo = Column(object_dtype)
     tags = Column(object_dtype)
+
+    _loader = PolygonCompanyLoader()
+
+    @classmethod
+    def get_loader(cls):
+        return cls._loader

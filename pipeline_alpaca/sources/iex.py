@@ -1,7 +1,7 @@
 import iexfinance
 
 from .util import (
-    daily_cache, parallelize, tradable_symbols
+    daily_cache, parallelize
 )
 
 

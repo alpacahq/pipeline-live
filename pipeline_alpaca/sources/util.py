@@ -76,10 +76,3 @@ def daily_cache(filename):
             return body
         return wrapper
     return decorator
-
-
-def tradable_symbols():
-    return [
-        a.symbol for a in tradeapi.REST().list_assets()
-        if a.tradable and a.status == 'active'
-    ]
