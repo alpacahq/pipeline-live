@@ -77,9 +77,8 @@ class USEquityPricingLoader(PipelineLoader):
         iex_symbols = [
             symbol['symbol'] for symbol in iexfinance.get_available_symbols()
         ]
-        input_symbols = symbols
-        symbols = list(set(iex_symbols) & set(input_symbols))
-        print('len(symbols) = {}'.format(len(symbols)))
+        query_symbols = list(set(iex_symbols) & set(symbols))
+        print('len(query_symbols) = {}'.format(len(query_symbols)))
         chart_range = '1m'
         timedelta = pd.Timestamp.utcnow() - start_date
         if timedelta > pd.Timedelta('730 days'):
@@ -93,7 +92,7 @@ class USEquityPricingLoader(PipelineLoader):
         elif timedelta > pd.Timedelta('30 days'):
             chart_range = '3m'
         print('chart_range={}'.format(chart_range))
-        prices = get_stockprices(symbols, chart_range=chart_range)
+        prices = get_stockprices(query_symbols, chart_range=chart_range)
 
         dfs = []
         for symbol in symbols:
