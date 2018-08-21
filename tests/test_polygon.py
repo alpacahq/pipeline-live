@@ -1,25 +1,6 @@
 import pandas as pd
 from pipeline_alpaca.polygon.fundamentals import PolygonCompany
-import pytest
-import tempfile
-from unittest.mock import patch
 from alpaca_trade_api.entity import Asset
-
-from pipeline_alpaca.sources import polygon as sources_polygon
-
-
-@pytest.fixture
-def tradeapi():
-    with patch.object(sources_polygon, 'tradeapi') as tradeapi:
-        yield tradeapi
-
-
-@pytest.fixture
-def data_path():
-    with patch('zipline.utils.paths.data_path') as data_path:
-        with tempfile.TemporaryDirectory() as t:
-            data_path.return_value = t
-            yield data_path
 
 
 def test_PolygonCompany(tradeapi, data_path):
@@ -54,7 +35,7 @@ def test_PolygonCompany(tradeapi, data_path):
          'phone': '412-315-2900',
          'ceo': 'Roy C. Harvey',
          'url': 'http://www.alcoa.com',
-         'description': 'Alcoa Corporation produces and sells bauxite, alumina, and aluminum products. It operates through six segments, Bauxite, Alumina, Aluminum, Cast Products, Energy, and Rolled Products. The company also offers aluminum cast products; and aluminum sheets for the production of cans for beverage, food, and pet food. In addition, it engages in the generation and sale of renewable energy, as well as provision of ancillary services. The company was formerly known as Alcoa Upstream Corporation and changed its name to Alcoa Corporation in October 2016. Alcoa Corporation is based in New York, New York.',
+         'description': 'Alcoa Corporation produces and sells bauxite, alumina, and aluminum products. It operates through six segments, Bauxite, Alumina, Aluminum, Cast Products, Energy, and Rolled Products. The company also offers aluminum cast products; and aluminum sheets for the production of cans for beverage, food, and pet food. In addition, it engages in the generation and sale of renewable energy, as well as provision of ancillary services. The company was formerly known as Alcoa Upstream Corporation and changed its name to Alcoa Corporation in October 2016. Alcoa Corporation is based in New York, New York.',  # noqa
          'exchange': 'New York Stock Exchange',
          'name': 'Alcoa Corp',
          'symbol': 'AA',

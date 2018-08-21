@@ -12,10 +12,13 @@ def list_symbols():
     ]
 
 
-@daily_cache(filename='polygon_companies.pkl')
 def companies():
     all_symbols = list_symbols()
+    return _companies(all_symbols)
 
+
+@daily_cache(filename='polygon_companies.pkl')
+def _companies(all_symbols):
     def fetch(symbols):
         api = tradeapi.REST()
         params = {
@@ -29,10 +32,13 @@ def companies():
     return parallelize(fetch, workers=25, splitlen=50)(all_symbols)
 
 
-@daily_cache(filename='polygon_financials.pkl')
 def financials():
     all_symbols = list_symbols()
+    return _financials(all_symbols)
 
+
+@daily_cache(filename='polygon_financials.pkl')
+def _financials(all_symbols):
     def fetch(symbols):
         api = tradeapi.REST()
         params = {

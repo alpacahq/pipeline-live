@@ -1,24 +1,5 @@
 import pandas as pd
 from pipeline_alpaca.iex.fundamentals import IEXKeyStats
-import pytest
-import tempfile
-from unittest.mock import patch
-
-from pipeline_alpaca.sources import iex as sources_iex
-
-
-@pytest.fixture
-def iexfinance():
-    with patch.object(sources_iex, 'iexfinance') as iexfinance:
-        yield iexfinance
-
-
-@pytest.fixture
-def data_path():
-    with patch('zipline.utils.paths.data_path') as data_path:
-        with tempfile.TemporaryDirectory() as t:
-            data_path.return_value = t
-            yield data_path
 
 
 def test_IEXKeyStats(iexfinance, data_path):

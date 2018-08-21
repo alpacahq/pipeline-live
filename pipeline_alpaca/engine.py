@@ -21,6 +21,7 @@ from zipline.utils.numpy_utils import (
 )
 from zipline.utils.pandas_utils import explode
 
+
 class LivePipelineEngine(object):
 
     def __init__(self,
@@ -50,12 +51,12 @@ class LivePipelineEngine(object):
         )]
         start_date = end_date
         screen_name = uuid4().hex
-        graph = pipeline.to_execution_plan( screen_name,
-            self._root_mask_term,
-            self._calendar,
-            start_date,
-            end_date,
-        )
+        graph = pipeline.to_execution_plan(screen_name,
+                                           self._root_mask_term,
+                                           self._calendar,
+                                           start_date,
+                                           end_date,
+                                           )
         extra_rows = graph.extra_rows[self._root_mask_term]
         root_mask = self._compute_root_mask(start_date, end_date, extra_rows)
         dates, assets, root_mask_values = explode(root_mask)
@@ -190,7 +191,7 @@ class LivePipelineEngine(object):
         graph : zipline.pipeline.graph.TermGraph
         dates : pd.DatetimeIndex
             Row labels for our root mask.
-        symbols : list 
+        symbols : list
             Column labels for our root mask.
         initial_workspace : dict
             Map from term -> output.
@@ -211,7 +212,9 @@ class LivePipelineEngine(object):
 
         # If loadable terms share the same loader and extra_rows, load them all
         # together.
-        loader_group_key = juxt(lambda x: x.dataset.get_loader(), getitem(graph.extra_rows))
+        loader_group_key = juxt(
+            lambda x: x.dataset.get_loader(), getitem(
+                graph.extra_rows))
         loader_groups = groupby(loader_group_key, graph.loadable_terms)
 
         refcounts = graph.initial_refcounts(workspace)
@@ -337,7 +340,8 @@ class LivePipelineEngine(object):
             # index=MultiIndex.from_arrays([dates_kept, assets_kept]),
         )
 
-    def _validate_compute_chunk_params(self, dates, symbols, initial_workspace):
+    def _validate_compute_chunk_params(
+            self, dates, symbols, initial_workspace):
         """
         Verify that the values passed to compute_chunk are well-formed.
         """

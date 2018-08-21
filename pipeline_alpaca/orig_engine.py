@@ -74,6 +74,7 @@ class ExplodingPipelineEngine(PipelineEngine):
     """
     A PipelineEngine that doesn't do anything.
     """
+
     def run_pipeline(self, pipeline, start_date, end_date):
         raise NoEngineRegistered(
             "Attempted to run a pipeline but no pipeline "
