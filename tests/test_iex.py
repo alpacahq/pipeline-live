@@ -1,5 +1,8 @@
+import numpy as np
 import pandas as pd
+
 from pipeline_alpaca.iex.fundamentals import IEXKeyStats
+from pipeline_alpaca.iex.pricing import USEquityPricing
 
 
 def test_IEXKeyStats(iexfinance, data_path):
@@ -132,3 +135,59 @@ def test_IEXKeyStats(iexfinance, data_path):
     out = loader.load_adjusted_array([marketcap], [date], ['AA'], [])
 
     assert out[marketcap][0][0] != 0.0
+
+
+def test_pricing_loader(iexfinance, data_path):
+    iexfinance.get_available_symbols.return_value = [
+        {
+            "symbol": "A",
+            "name": "AGILENT TECHNOLOGIES INC",
+            "date": "2017-04-19",
+            "isEnabled": True,
+            "type": "cs",
+            "iexId": "1"
+        },
+        {
+            "symbol": "AA",
+            "name": "ALCOA CORP",
+            "date": "2017-04-19",
+            "isEnabled": True,
+            "type": "cs",
+            "iexId": "12042"
+        }
+    ]
+
+    iexfinance.Stock().get_chart.return_value = {
+        'AA': [{
+            'date': '2018-08-21',
+            'open': 41.88,
+            'high': 43.22,
+            'low': 41.88,
+            'close': 43.03,
+            'volume': 3095888,
+            'unadjustedVolume': 3095888,
+            'change': 1.2,
+            'changePercent': 2.869,
+            'vwap': 42.8847,
+            'label': 'Aug 21',
+            'changeOverTime': 0.04113234938301483},
+            {'date': '2018-08-22',
+             'open': 43.2,
+             'high': 43.79,
+             'low': 43.12,
+             'close': 43.22,
+             'volume': 2037865,
+             'unadjustedVolume': 2037865,
+             'change': 0.19,
+             'changePercent': 0.442,
+             'vwap': 43.3733,
+             'label': 'Aug 22',
+             'changeOverTime': 0.0457294943140576}]}
+    loader = USEquityPricing.get_loader()
+    columns = [USEquityPricing.close]
+    dates = [pd.Timestamp('2018-08-22', tz='UTC')]
+    symbols = ['AA']
+    mask = np.zeros((1, 1), dtype='bool')
+    out = loader.load_adjusted_array(columns, dates, symbols, mask)
+
+    assert out[USEquityPricing.close]._data.shape == (1, 1)

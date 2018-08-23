@@ -419,3 +419,55 @@ def test_iex(iexfinance, data_path):
     financials = iex.financials()
     assert len(financials) == 1
     assert len(financials['AA']) == 4
+
+
+def test_iex_prices(iexfinance, data_path):
+    iexfinance.get_available_symbols.return_value = [
+        {
+            "symbol": "A",
+            "name": "AGILENT TECHNOLOGIES INC",
+            "date": "2017-04-19",
+            "isEnabled": True,
+            "type": "cs",
+            "iexId": "1"
+        },
+        {
+            "symbol": "AA",
+            "name": "ALCOA CORP",
+            "date": "2017-04-19",
+            "isEnabled": True,
+            "type": "cs",
+            "iexId": "12042"
+        }
+    ]
+
+    iexfinance.Stock().get_chart.return_value = {
+        'AA': [{
+            'date': '2018-08-21',
+            'open': 41.88,
+            'high': 43.22,
+            'low': 41.88,
+            'close': 43.03,
+            'volume': 3095888,
+            'unadjustedVolume': 3095888,
+            'change': 1.2,
+            'changePercent': 2.869,
+            'vwap': 42.8847,
+            'label': 'Aug 21',
+            'changeOverTime': 0.04113234938301483},
+            {'date': '2018-08-22',
+             'open': 43.2,
+             'high': 43.79,
+             'low': 43.12,
+             'close': 43.22,
+             'volume': 2037865,
+             'unadjustedVolume': 2037865,
+             'change': 0.19,
+             'changePercent': 0.442,
+             'vwap': 43.3733,
+             'label': 'Aug 22',
+             'changeOverTime': 0.0457294943140576}]}
+
+    data = iex.get_stockprices()
+    assert len(data) == 1
+    data['AA'].open[1] == 43.2

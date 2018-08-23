@@ -1,10 +1,9 @@
 from uuid import uuid4
 from numpy import array
 import pandas as pd
-from pandas import DataFrame, MultiIndex
+from pandas import DataFrame
 from six import (
     iteritems,
-    with_metaclass,
 )
 from toolz import groupby, juxt
 from toolz.curried.operator import getitem
@@ -17,7 +16,6 @@ from zipline.utils.calendars import get_calendar
 from zipline.utils.numpy_utils import (
     as_column,
     repeat_first_axis,
-    repeat_last_axis,
 )
 from zipline.utils.pandas_utils import explode
 
@@ -309,7 +307,7 @@ class LivePipelineEngine(object):
             # mask to each array.
             #
             # Slicing `dates` here to preserve pandas metadata.
-            empty_dates = dates[:0]
+            # empty_dates = dates[:0]
             empty_assets = array([], dtype=object)
             return DataFrame(
                 data={

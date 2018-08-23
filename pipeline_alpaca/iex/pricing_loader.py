@@ -1,6 +1,3 @@
-import concurrent.futures
-
-import iexfinance
 import numpy as np
 import pandas as pd
 
@@ -9,46 +6,7 @@ from zipline.pipeline.loaders.base import PipelineLoader
 from zipline.utils.calendars import get_calendar
 from zipline.errors import NoFurtherDataError
 
-
-def get_stockprices(symbols, chart_range='1y'):
-    '''Get stock data (key stats and previous) from IEX.
-    Just deal with IEX's 99 stocks limit per request.
-    '''
-
-    def get_chart(symbols):
-        charts = iexfinance.Stock(symbols).get_chart(range=chart_range)
-        result = {}
-        for symbol, obj in charts.items():
-            df = pd.DataFrame(
-                obj,
-                columns=('date', 'open', 'high', 'low', 'close', 'volume'),
-            ).set_index('date')
-            df.index = pd.to_datetime(df.index, utc=True)
-            result[symbol] = df
-        return result
-
-    result = {}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=25) as executor:
-        tasks = []
-        partlen = 99
-        for i in range(0, len(symbols), partlen):
-            part = symbols[i:i + partlen]
-            task = executor.submit(get_chart, part)
-            tasks.append(task)
-
-        total_count = len(symbols)
-        report_percent = 10
-        processed = 0
-        for task in concurrent.futures.as_completed(tasks):
-            symbol_charts = task.result()
-            result.update(symbol_charts)
-            processed += len(symbol_charts)
-            percent = processed / total_count * 100
-            if percent >= report_percent:
-                print('{:.2f}% completed'.format(percent))
-                report_percent = (percent + 10.0) // 10 * 10
-
-    return result
+from pipeline_alpaca.sources import iex
 
 
 class USEquityPricingLoader(PipelineLoader):
@@ -74,11 +32,6 @@ class USEquityPricingLoader(PipelineLoader):
         sessions = self._all_sessions
         sessions = sessions[(sessions >= start_date) & (sessions <= end_date)]
 
-        iex_symbols = [
-            symbol['symbol'] for symbol in iexfinance.get_available_symbols()
-        ]
-        query_symbols = list(set(iex_symbols) & set(symbols))
-        print('len(query_symbols) = {}'.format(len(query_symbols)))
         chart_range = '1m'
         timedelta = pd.Timestamp.utcnow() - start_date
         if timedelta > pd.Timedelta('730 days'):
@@ -92,7 +45,7 @@ class USEquityPricingLoader(PipelineLoader):
         elif timedelta > pd.Timedelta('30 days'):
             chart_range = '3m'
         print('chart_range={}'.format(chart_range))
-        prices = get_stockprices(query_symbols, chart_range=chart_range)
+        prices = iex.get_stockprices(chart_range)
 
         dfs = []
         for symbol in symbols:
