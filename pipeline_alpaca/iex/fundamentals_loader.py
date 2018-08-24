@@ -16,7 +16,7 @@ class IEXBaseLoader(PipelineLoader):
                 for symbol in symbols
             ], dtype=c.dtype)
             if c.dtype == object_dtype:
-                data[data is None] = c.missing_value
+                data[data == None] = c.missing_value  # noqa
             out[c] = np.tile(data, (len(dates), 1))
         return out
 

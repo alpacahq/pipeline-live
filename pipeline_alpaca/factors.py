@@ -25,7 +25,6 @@ for name in dir(z_factors):
     if factor != z_factors.Factor and hasattr(
             factor, 'inputs') and issubclass(
             factor, z_factors.Factor):
-        print(factor)
         new_factor = type(factor.__name__, (factor,), {
             'inputs': _replace_inputs(factor.inputs)
         })
