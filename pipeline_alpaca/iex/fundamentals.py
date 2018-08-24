@@ -5,7 +5,7 @@ from zipline.utils.numpy_utils import (
 )
 from zipline.pipeline.data.dataset import Column, DataSet
 
-from .fundamentals_loader import IEXKeyStatsLoader
+from .fundamentals_loader import IEXKeyStatsLoader, IEXCompanyLoader
 
 
 class IEXKeyStats(DataSet):
@@ -36,8 +36,7 @@ class IEXKeyStats(DataSet):
   "debt": 358038000000,
   "ttmEPS": 8.55,
   "revenuePerShare": 42.2830389885382,
-  "revenuePerEmployee": 1900491.3793103448,
-  "peRatioHigh": 25.5,
+  "revenuePerEmployee": 1900491.3793103448, "peRatioHigh": 25.5,
   "peRatioLow": 8.7,
   "EPSSurpriseDollar": null,
   "EPSSurprisePercent": 3.9604,
@@ -118,6 +117,26 @@ class IEXKeyStats(DataSet):
     day5ChangePercent = Column(float64_dtype, missing_value=np.nan)
 
     _loader = IEXKeyStatsLoader()
+
+    @classmethod
+    def get_loader(cls):
+        return cls._loader
+
+
+class IEXCompany(DataSet):
+
+    symbol = Column(object_dtype, missing_value='')
+    companyName = Column(object_dtype, missing_value='')
+    exchange = Column(object_dtype, missing_value='')
+    industry = Column(object_dtype, missing_value='')
+    website = Column(object_dtype, missing_value='')
+    description = Column(object_dtype, missing_value='')
+    CEO = Column(object_dtype, missing_value='')
+    issueType = Column(object_dtype, missing_value='')
+    sector = Column(object_dtype, missing_value='')
+    # tags = Column(object_dtype, missing_value='')
+
+    _loader = IEXCompanyLoader()
 
     @classmethod
     def get_loader(cls):

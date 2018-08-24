@@ -420,6 +420,9 @@ def test_iex(iexfinance, data_path):
     assert len(financials) == 1
     assert len(financials['AA']) == 4
 
+    ed = iex._ensure_dict(1, ['AA'])
+    assert ed['AA'] == 1
+
 
 def test_iex_prices(iexfinance, data_path):
     iexfinance.get_available_symbols.return_value = [

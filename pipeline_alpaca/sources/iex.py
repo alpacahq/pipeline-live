@@ -12,30 +12,37 @@ def list_symbols():
     ]
 
 
-def key_stats():
-    all_symbols = list_symbols()
-    return _key_stats(all_symbols)
+def _ensure_dict(result, symbols):
+    if len(symbols) == 1:
+        return {symbols[0]: result}
+    return result
 
 
-@daily_cache(filename='iex_key_stats.pkl')
-def _key_stats(all_symbols):
-    def fetch(symbols):
-        return iexfinance.Stock(symbols).get_key_stats()
+class IEXGetter(object):
 
-    return parallelize(fetch, splitlen=99)(all_symbols)
+    def __init__(self, method):
+        self._method = method
+
+    def __call__(self):
+        method_name = 'get_{}'.format(self._method)
+
+        @daily_cache(filename='iex_{}.pkl'.format(self._method))
+        def _get(all_symbols):
+            def fetch(symbols):
+                return _ensure_dict(
+                    getattr(iexfinance.Stock(symbols), method_name)(),
+                    symbols
+                )
+
+            return parallelize(fetch, splitlen=99)(all_symbols)
+
+        all_symbols = list_symbols()
+        return _get(all_symbols)
 
 
-def financials():
-    all_symbols = list_symbols()
-    return _financials(all_symbols)
-
-
-@daily_cache(filename='iex_financials.pkl')
-def _financials(all_symbols):
-    def fetch(symbols):
-        return iexfinance.Stock(symbols).get_financials()
-
-    return parallelize(fetch, splitlen=99)(all_symbols)
+key_stats = IEXGetter('key_stats')
+company = IEXGetter('company')
+financials = IEXGetter('financials')
 
 
 def get_stockprices(chart_range='1y'):
@@ -59,7 +66,10 @@ def _get_stockprices(symbols, chart_range='1y'):
     '''
 
     def fetch(symbols):
-        charts = iexfinance.Stock(symbols).get_chart(range=chart_range)
+        charts = _ensure_dict(
+            iexfinance.Stock(symbols).get_chart(range=chart_range),
+            symbols
+        )
         result = {}
         for symbol, obj in charts.items():
             df = pd.DataFrame(

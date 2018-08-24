@@ -2,17 +2,32 @@ import numpy as np
 
 from pipeline_alpaca.sources import iex
 from zipline.pipeline.loaders.base import PipelineLoader
+from zipline.utils.numpy_utils import object_dtype
 
 
-class IEXKeyStatsLoader(PipelineLoader):
+class IEXBaseLoader(PipelineLoader):
 
     def load_adjusted_array(self, columns, dates, symbols, mask):
-        key_stats = iex.key_stats()
+        symbol_dict = self._load()
         out = {}
         for c in columns:
-            data = [
-                key_stats.get(symbol, {}).get(c.name, c.missing_value)
+            data = np.array([
+                symbol_dict.get(symbol, {}).get(c.name, c.missing_value)
                 for symbol in symbols
-            ]
-            out[c] = np.tile(np.array(data, dtype=c.dtype), (len(dates), 1))
+            ], dtype=c.dtype)
+            if c.dtype == object_dtype:
+                data[data is None] = c.missing_value
+            out[c] = np.tile(data, (len(dates), 1))
         return out
+
+
+class IEXKeyStatsLoader(IEXBaseLoader):
+
+    def _load(self):
+        return iex.key_stats()
+
+
+class IEXCompanyLoader(IEXBaseLoader):
+
+    def _load(self):
+        return iex.company()
