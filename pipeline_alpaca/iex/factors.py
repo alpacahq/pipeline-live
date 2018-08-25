@@ -1,7 +1,11 @@
+'''
+Duplicate builtin factor classes in zipline with IEX's USEquityPricing
+'''
+
 from zipline.pipeline.data import USEquityPricing as z_pricing
 from zipline.pipeline import factors as z_factors
 
-from pipeline_alpaca.iex.pricing import USEquityPricing as iex_pricing
+from .pricing import USEquityPricing as iex_pricing
 
 
 def _replace_inputs(inputs):

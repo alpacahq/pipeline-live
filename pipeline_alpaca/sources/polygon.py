@@ -12,13 +12,13 @@ def list_symbols():
     ]
 
 
-def companies():
+def company():
     all_symbols = list_symbols()
-    return _companies(all_symbols)
+    return _company(all_symbols)
 
 
-@daily_cache(filename='polygon_companies.pkl')
-def _companies(all_symbols):
+@daily_cache(filename='polygon_company.pkl')
+def _company(all_symbols):
     def fetch(symbols):
         api = tradeapi.REST()
         params = {

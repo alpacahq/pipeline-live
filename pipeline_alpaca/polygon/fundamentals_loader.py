@@ -9,11 +9,11 @@ class PolygonCompanyLoader(PipelineLoader):
 
     def load_adjusted_array(self, columns, dates, symbols, mask):
 
-        companies = polygon.companies()
+        company = polygon.company()
         out = {}
         for c in columns:
             data = [
-                companies.get(symbol, {}).get(c.name, c.missing_value)
+                company.get(symbol, {}).get(c.name, c.missing_value)
                 for symbol in symbols
             ]
             out[c] = np.tile(np.array(data, dtype=c.dtype), (len(dates), 1))
