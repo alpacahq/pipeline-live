@@ -61,7 +61,7 @@ Since most of the data does not change during the day, the data access layer
 caches the dataset on disk.  In case you need to purge the cache, the cache
 data is located in `$ZIPLINE_ROOT/data/daily_cache`.
 
-## Key Classes and Functions
+## Pipeline API
 
 ### pipeline_live.engine.LivePipelineEngine
 This class provides the similar interface to `zipline.pipeline.engine.SimplePipelineEngine`.
@@ -69,6 +69,9 @@ The main difference is its `run_pipeline` does not require the start and end dat
 and returns a DataFrame with the data for the current date (US/Eastern time).
 Its constructor accepts `list_symbol` function that is supposed to return the full set of
 symbols as a string list, which is used as the maximum universe inside the engine.
+
+## IEX Data Source API
+You don't have to configure anything to use these API
 
 ### pipeline_live.data.iex.pricing.USEquityPricing
 This class provides the basic price information retrieved from IEX Chart API.
@@ -91,3 +94,15 @@ A shortcut for `IEXCompany.sector.latest`
 
 ### pipeline_live.data.iex.classifiers.Industry()
 A shortcut for `IEXCompany.industry.latest`
+
+## Alpaca/Polygon Data Source API
+You will need to set [Alpaca](https://alpaca.markets/) API key to use these API.
+
+### pipeline_live.data.polygon.fundamentals.PolygonCompany
+This class provides the DataSet interface using [Polygon Symbol Details API](https://polygon.io/docs/#!/Meta-Data/get_v1_meta_symbols_symbol_company)
+
+### pipeline_live.data.polygon.filters.IsPrimaryShareEmulation
+This class filteres symbols by the following rule to return something close to `IsPrimaryShare()` in Quantopian.
+
+- must be a US company
+- must have a valid financial data
