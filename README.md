@@ -33,6 +33,7 @@ from pipeline_alpaca.data.sources.iex import list_symbols
 from pipeline_alpaca.data.iex.pricing import USEquityPricing
 from pipeline_alpaca.data.iex.fundamentals import IEXKeyStats
 from pipeline_alpaca.data.iex.factors import AverageDollarVolume
+from zipline.pipeline import Pipeline
 
 eng = LivePipelineEngine(list_symbols)
 top5 = AverageDollarVolume(window_length=20).top(5)
@@ -42,7 +43,21 @@ pipe = Pipeline({
 }, screen=top5)
 
 df = eng.run_pipeline(pipe)
+
+'''
+        close     marketcap
+AAPL   215.49  1.044037e+12
+AMZN  1902.90  9.293372e+11
+FB     172.90  5.042383e+11
+QQQ    180.80  7.092998e+10
+SPY    285.79  2.737475e+11
+'''
 ```
+
+## Data Cache
+Since most of the data does not change during the day, the data access layer
+caches the dataset on disk.  In case you need to purge the cache, the cache
+data is located in `$ZIPLINE_ROOT/daily_cache`.
 
 ## Key Classes and Functions
 
