@@ -110,7 +110,7 @@ This class provides the DataSet interface using
 ### pipeline_live.data.polygon.filters.IsPrimaryShareEmulation
 Experimental. This class filteres symbols by the following
 rule to return something close to
-[IsPrimaryShare()](quantopian_pipeline_filters_fundamentals_IsPrimaryShare) in Quantopian.
+[IsPrimaryShare()](https://www.quantopian.com/help#quantopian_pipeline_filters_fundamentals_IsPrimaryShare) in Quantopian.
 
 - must be a US company
 - must have a valid financial data
