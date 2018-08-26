@@ -2,8 +2,8 @@ import pytest
 import tempfile
 from unittest.mock import patch
 
-from pipeline_alpaca.sources import polygon as sources_polygon
-from pipeline_alpaca.sources import iex as sources_iex
+from pipeline_alpaca.data.sources import polygon as sources_polygon
+from pipeline_alpaca.data.sources import iex as sources_iex
 
 
 @pytest.fixture

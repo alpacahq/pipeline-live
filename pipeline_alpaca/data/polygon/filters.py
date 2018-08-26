@@ -1,7 +1,7 @@
 import numpy as np
 
+from pipeline_alpaca.data.sources import polygon
 from zipline.pipeline.filters import CustomFilter
-from pipeline_alpaca.sources import polygon
 
 
 class IsPrimaryShareEmulation(CustomFilter):
