@@ -1,4 +1,4 @@
-from pipeline_alpaca import factors
+from pipeline_alpaca.iex import factors
 from pipeline_alpaca.iex.pricing import USEquityPricing
 
 

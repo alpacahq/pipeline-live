@@ -196,7 +196,7 @@ def test_polygon(tradeapi, data_path):
          'updated': '2018-02-05T06:32:35.464Z',
          'tags': ['Basic Materials', 'Aluminum', 'Metals & Mining'],
          'similar': ['BBL', 'CENX', 'KALU', 'BHP', 'ACH']}]
-    data = polygon.companies()
+    data = polygon.company()
     assert len(data) == 2
     assert data['AA']['name'] == 'Alcoa Corp'
 
