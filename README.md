@@ -7,7 +7,9 @@ sources such as Morningstar is also not available to many. This library is
 to address this issue by using online API data sources and simplify the interface
 for live trading usage.
 The interface complies the original zipline/pipeline for the most part.  For more
-details about the Pipeline API, please see [Quantopian's tutorial](https://www.quantopian.com/tutorials/pipeline) and [zipline document](https://www.zipline.io/).
+details about the Pipeline API, please see
+[Quantopian's tutorial](https://www.quantopian.com/tutorials/pipeline) and
+[zipline document](https://www.zipline.io/).
 
 ## Data Sources
 This library premoninantly relies on the [IEX public dataAPI](https://iextrading.com/developer/docs/) for daily
@@ -74,13 +76,16 @@ symbols as a string list, which is used as the maximum universe inside the engin
 You don't have to configure anything to use these API
 
 ### pipeline_live.data.iex.pricing.USEquityPricing
-This class provides the basic price information retrieved from IEX Chart API.
+This class provides the basic price information retrieved from
+[IEX Chart API](https://iextrading.com/developer/docs/#chart).
 
 ### pipeline_live.data.iex.fundamentals.IEXCompany
-This provides the DataSet interface using [IEX Company API](https://iextrading.com/developer/docs/#company).
+This provides the DataSet interface using
+[IEX Company API](https://iextrading.com/developer/docs/#company).
 
 ### pipeline_live.data.iex.fundamentals.IEXKeyStats
-This provides the DataSet interface using [IEX Key Stats API](https://iextrading.com/developer/docs/#key-stats).
+This provides the DataSet interface using
+[IEX Key Stats API](https://iextrading.com/developer/docs/#key-stats).
 
 ### pipeline_live.data.iex.factors
 It is important to note that the original builtin factors from zipline does
@@ -99,10 +104,13 @@ A shortcut for `IEXCompany.industry.latest`
 You will need to set [Alpaca](https://alpaca.markets/) API key to use these API.
 
 ### pipeline_live.data.polygon.fundamentals.PolygonCompany
-This class provides the DataSet interface using [Polygon Symbol Details API](https://polygon.io/docs/#!/Meta-Data/get_v1_meta_symbols_symbol_company)
+This class provides the DataSet interface using
+[Polygon Symbol Details API](https://polygon.io/docs/#!/Meta-Data/get_v1_meta_symbols_symbol_company)
 
 ### pipeline_live.data.polygon.filters.IsPrimaryShareEmulation
-This class filteres symbols by the following rule to return something close to `IsPrimaryShare()` in Quantopian.
+Experimental. This class filteres symbols by the following
+rule to return something close to
+[IsPrimaryShare()](quantopian_pipeline_filters_fundamentals_IsPrimaryShare) in Quantopian.
 
 - must be a US company
 - must have a valid financial data
