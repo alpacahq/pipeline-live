@@ -20,7 +20,9 @@ the time. Currently supported data sources include the following.
 
 `pipeline-alpaca` is a PyPI module and you can install it using `pip` command.
 
-```sh $ pip install pipeline-alpaca ```
+```sh
+$ pip install pipeline-alpaca
+```
 
 This module is tested and expected to work with python 3.6 and later
 
