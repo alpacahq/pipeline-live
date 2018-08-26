@@ -12,7 +12,7 @@ details about the Pipeline API, please see
 [zipline document](https://www.zipline.io/).
 
 ## Data Sources
-This library premoninantly relies on the [IEX public dataAPI](https://iextrading.com/developer/docs/) for daily
+This library premoninantly relies on the [IEX public data API](https://iextrading.com/developer/docs/) for daily
 prices and fundamentals, but aims to connect to other data sources over
 the time. Currently supported data sources include the following.
 
