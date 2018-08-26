@@ -7,10 +7,10 @@ sources such as Morningstar is also not available to many. This library is
 to address this issue by using online API data sources and simplify the interface
 for live trading usage.
 The interface complies the original zipline/pipeline for the most part.  For more
-details about the Pipeline API, please refer the zipline document.
+details about the Pipeline API, please see [Quantopian's tutorial](https://www.quantopian.com/tutorials/pipeline) and [zipline document](https://www.zipline.io/).
 
 ## Data Sources
-This library premoninantly relies on the IEX public data API for daily
+This library premoninantly relies on the [IEX public dataAPI](https://iextrading.com/developer/docs/) for daily
 prices and fundamentals, but aims to connect to other data sources over
 the time. Currently supported data sources include the following.
 
