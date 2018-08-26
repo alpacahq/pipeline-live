@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from pipeline_alpaca.data.iex.fundamentals import IEXKeyStats
-from pipeline_alpaca.data.iex.pricing import USEquityPricing
+from pipeline_live.data.iex.fundamentals import IEXKeyStats
+from pipeline_live.data.iex.pricing import USEquityPricing
 
 from .datamock import mock_iex
 

@@ -1,5 +1,5 @@
 # Zipline Pipeline Extension for Live Trading
-`pipeline-alpaca` is an extension for zipline pipeline independently usable
+`pipeline-live` is an extension for zipline pipeline independently usable
 for live trading, outside of zipline. While zipline is a great backtesting
 library, the default Pipeline API requires complicated setup for data bundle,
 which is often challenging to average users. Quantopian's proprietary data
@@ -18,10 +18,10 @@ the time. Currently supported data sources include the following.
 
 ## Install
 
-`pipeline-alpaca` is a PyPI module and you can install it using `pip` command.
+`pipeline-live` is a PyPI module and you can install it using `pip` command.
 
 ```sh
-$ pip install pipeline-alpaca
+$ pip install pipeline-live
 ```
 
 This module is tested and expected to work with python 3.6 and later
@@ -30,11 +30,11 @@ This module is tested and expected to work with python 3.6 and later
 Here is a simple pipeline example.
 
 ```py
-from pipeline_alpaca.engine import LivePipelineEngine
-from pipeline_alpaca.data.sources.iex import list_symbols
-from pipeline_alpaca.data.iex.pricing import USEquityPricing
-from pipeline_alpaca.data.iex.fundamentals import IEXKeyStats
-from pipeline_alpaca.data.iex.factors import AverageDollarVolume
+from pipeline_live.engine import LivePipelineEngine
+from pipeline_live.data.sources.iex import list_symbols
+from pipeline_live.data.iex.pricing import USEquityPricing
+from pipeline_live.data.iex.fundamentals import IEXKeyStats
+from pipeline_live.data.iex.factors import AverageDollarVolume
 from zipline.pipeline import Pipeline
 
 eng = LivePipelineEngine(list_symbols)
@@ -59,34 +59,35 @@ SPY    285.79  2.737475e+11
 ## Data Cache
 Since most of the data does not change during the day, the data access layer
 caches the dataset on disk.  In case you need to purge the cache, the cache
-data is located in `$ZIPLINE_ROOT/daily_cache`.
+data is located in `$ZIPLINE_ROOT/data/daily_cache`.
 
 ## Key Classes and Functions
 
-### pipeline_alpaca.engine.LivePipelineEngine
+### pipeline_live.engine.LivePipelineEngine
 This class provides the similar interface to `zipline.pipeline.engine.SimplePipelineEngine`.
-The main difference is its `run_pipeline` does not require the start and end dates as parameters, and returns a DataFrame with the data for the current date (US/Eastern time). Its constructor accepts `list_symbol` function that
-is supposed to return the full set of symbols as a string list, which is
-used as the maximum universe inside the engine.
+The main difference is its `run_pipeline` does not require the start and end dates as parameters,
+and returns a DataFrame with the data for the current date (US/Eastern time).
+Its constructor accepts `list_symbol` function that is supposed to return the full set of
+symbols as a string list, which is used as the maximum universe inside the engine.
 
-### pipeline_alpaca.data.iex.pricing.USEquityPricing
+### pipeline_live.data.iex.pricing.USEquityPricing
 This class provides the basic price information retrieved from IEX Chart API.
 
-### pipeline_alpaca.data.iex.fundamentals.IEXCompany
+### pipeline_live.data.iex.fundamentals.IEXCompany
 This provides the DataSet interface using [IEX Company API](https://iextrading.com/developer/docs/#company).
 
-### pipeline_alpaca.data.iex.fundamentals.IEXKeyStats
+### pipeline_live.data.iex.fundamentals.IEXKeyStats
 This provides the DataSet interface using [IEX Key Stats API](https://iextrading.com/developer/docs/#key-stats).
 
-### pipeline_alpaca.data.iex.factors
+### pipeline_live.data.iex.factors
 It is important to note that the original builtin factors from zipline does
 not work here as is, since some of them rely on zipline's USEquityPricing class.
 This package provides the same set of zipline's builtin factor classes using
-`pipeline_alpaca.data.iex.pricing.USEquityPricing` class. For the complete
+`pipeline_live.data.iex.pricing.USEquityPricing` class. For the complete
 list of builtin factors, please refer [zipline document](https://www.zipline.io/appendix.html#built-in-factors)
 
-### pipeline_alpaca.data.iex.classifiers.Sector()
+### pipeline_live.data.iex.classifiers.Sector()
 A shortcut for `IEXCompany.sector.latest`
 
-### pipeline_alpaca.data.iex.classifiers.Industry()
+### pipeline_live.data.iex.classifiers.Industry()
 A shortcut for `IEXCompany.industry.latest`

@@ -6,7 +6,7 @@ from zipline.pipeline.loaders.base import PipelineLoader
 from zipline.utils.calendars import get_calendar
 from zipline.errors import NoFurtherDataError
 
-from pipeline_alpaca.data.sources import iex
+from pipeline_live.data.sources import iex
 
 
 class USEquityPricingLoader(PipelineLoader):

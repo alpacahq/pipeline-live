@@ -2,7 +2,7 @@ import numpy as np
 
 from zipline.pipeline.loaders.base import PipelineLoader
 
-from pipeline_alpaca.data.sources import polygon
+from pipeline_live.data.sources import polygon
 
 
 class PolygonCompanyLoader(PipelineLoader):

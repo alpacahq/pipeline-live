@@ -1,6 +1,6 @@
 import pandas as pd
-from pipeline_alpaca.data.polygon.fundamentals import PolygonCompany
-from pipeline_alpaca.data.polygon.filters import IsPrimaryShareEmulation
+from pipeline_live.data.polygon.fundamentals import PolygonCompany
+from pipeline_live.data.polygon.filters import IsPrimaryShareEmulation
 
 from .datamock import mock_tradeapi
 
