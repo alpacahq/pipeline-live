@@ -1,5 +1,5 @@
 from ._version import __version__
 
-all = [
+__all__ = [
     '__version__'
 ]
