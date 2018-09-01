@@ -11,6 +11,9 @@ details about the Pipeline API, please see
 [Quantopian's tutorial](https://www.quantopian.com/tutorials/pipeline) and
 [zipline document](https://www.zipline.io/).
 
+If you are looking to use this library for your Quantopian algorithm,
+check out the [migration document](./migration.md).
+
 ## Data Sources
 This library predominantly relies on the [IEX public data API](https://iextrading.com/developer/docs/) for daily
 prices and fundamentals, but plans to connect to other data sources in
