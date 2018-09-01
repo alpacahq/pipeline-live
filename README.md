@@ -12,11 +12,11 @@ details about the Pipeline API, please see
 [zipline document](https://www.zipline.io/).
 
 ## Data Sources
-This library premoninantly relies on the [IEX public data API](https://iextrading.com/developer/docs/) for daily
-prices and fundamentals, but aims to connect to other data sources over
-the time. Currently supported data sources include the following.
+This library predominantly relies on the [IEX public data API](https://iextrading.com/developer/docs/) for daily
+prices and fundamentals, but plans to connect to other data sources in
+the future. Currently supported data sources include the following.
 
-- Alpaca/Polygon
+- [Alpaca/Polygon](https://docs.alpaca.markets/)
 
 ## Install
 
