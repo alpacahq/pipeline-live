@@ -2,7 +2,7 @@
 pipeline-live helps you run your algorithm outside of the Quantopian.
 Although this project is an independent effort to provide the Pipeline
 API using public/private data, this document is to describe the common
-practice about how to migrate your pipeline code from the Quantopian
+practices around how to migrate your pipeline code from the Quantopian
 environment.
 
 Along with these practices, you can migrate your Algorithm API from Quantopian
@@ -10,7 +10,7 @@ using [pylivetrader](https://github.com/alpacahq/pylivetrader), and
 pylivetrader can run the pipeline object from this package.
 
 ## USEquityPricing
-Most important class to think about first is the USEquityPricing class
+The most important class to think about first is the USEquityPricing class
 and it is well covered by
 `pipeline_live.data.iex.pricing.USEquityPricing` class.
 This class gets the market-wide daily price data (OHLCV) up to the
@@ -44,8 +44,8 @@ from pipeline_live.data.iex.pricing import USEquityPricing
 ```
 
 Of course, the builtin factor classes in the original zipline are mostly
-pure functions and take input explicitly, so if you give the correct
-input, they also work with this `USEquityPricing`.
+pure functions and take inputs explicitly, so if you give the correct
+ones, they also work with this `USEquityPricing`.
 
 ```py
 from zipline.pipeline.factors import AverageDollarVolume
@@ -123,3 +123,9 @@ Within this library, you have access to Polygon fundamentals, which have
 different set of stock info/details. If you have API key for Polygon,
 you may want to look at the `pipeline_live.data.polygon.filters.IsPrimaryShareEmulation` class for
 the replacement, too.
+
+## ADR
+While IEX Company API has a field called `issueType` and the API document
+indicates this field can use for ADR check, this value has been
+not very accurate, as of writing. If you have access to Polygon, you can
+check out `PolygonCompany.country` field to filter out non-US companies.

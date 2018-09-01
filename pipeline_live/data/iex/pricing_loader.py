@@ -1,4 +1,5 @@
 import numpy as np
+import logbook
 import pandas as pd
 
 from zipline.lib.adjusted_array import AdjustedArray
@@ -7,6 +8,9 @@ from zipline.utils.calendars import get_calendar
 from zipline.errors import NoFurtherDataError
 
 from pipeline_live.data.sources import iex
+
+
+log = logbook.Logger(__name__)
 
 
 class USEquityPricingLoader(PipelineLoader):
@@ -44,7 +48,7 @@ class USEquityPricingLoader(PipelineLoader):
             chart_range = '6m'
         elif timedelta > pd.Timedelta('30 days'):
             chart_range = '3m'
-        print('chart_range={}'.format(chart_range))
+        log.info('chart_range={}'.format(chart_range))
         prices = iex.get_stockprices(chart_range)
 
         dfs = []
