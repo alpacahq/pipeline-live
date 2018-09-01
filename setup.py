@@ -1,28 +1,38 @@
 #!/usr/bin/env python
 
-import ast
-import re
+from runpy import run_path
+from pathlib import Path
 from setuptools import setup, find_packages
 
-_version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('pipeline_live/_version.py', 'rb') as f:
-    version = str(ast.literal_eval(_version_re.search(
-        f.read().decode('utf-8')).group(1)))
+VERSION = run_path(
+    str(Path(__file__).parent) + '/pipeline_live/_version.py')['__version__']
 
 with open('README.md') as readme_file:
     README = readme_file.read()
 
 setup(
     name='pipeline-live',
-    version=version,
+    version=VERSION,
     description='Zipline Pipeline extension for live trade',
     long_description=README,
     long_description_content_type='text/markdown',
+    license='Apache 2.0',
     author='Alpaca',
     author_email='oss@alpaca.markets',
-    url='https://github.com/alpacahq/pipeline_live',
+    url='https://github.com/alpacahq/pipeline-live',
     keywords='financial,zipline,pipeline,stock,screening,api,trade',
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: Apache Software License',
+        'Natural Language :: English',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Operating System :: OS Independent',
+        'Topic :: Office/Business :: Financial',
+    ],
     packages=find_packages(),
     install_requires=[
         'alpaca-trade-api',
