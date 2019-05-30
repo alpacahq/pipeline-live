@@ -21,3 +21,12 @@ class IsPrimaryShareEmulation(CustomFilter):
             for symbol in symbols
         ], dtype=bool)
         out[:] = ary
+
+class StaticSymbols(CustomFilter):
+    inputs = ()
+    window_length = 1
+    params = ('symbols',)
+
+    def compute(self, today, assets, out, symbols, *inputs):
+        ary = np.array([symbol in symbols for symbol in assets])
+        out[:] = ary

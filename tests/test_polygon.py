@@ -1,6 +1,6 @@
 import pandas as pd
 from pipeline_live.data.polygon.fundamentals import PolygonCompany
-from pipeline_live.data.polygon.filters import IsPrimaryShareEmulation
+from pipeline_live.data.polygon.filters import IsPrimaryShareEmulation, StaticSymbols
 
 from .datamock import mock_tradeapi
 
@@ -28,3 +28,12 @@ def test_IsPrimaryShareEmulation(tradeapi, data_path):
     out = [None, None]
     emu.compute(today, symbols, out)
     assert not out[0]
+
+def test_StaticSymbols(tradeapi, data_path):
+    emu = StaticSymbols(symbols=('A', 'BB'))
+
+    today = object()
+    assets = ['A', 'AA', 'BB']
+    out = [None, None, None]
+    emu.compute(today, assets, out)
+    assert not out[1]
