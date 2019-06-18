@@ -30,10 +30,11 @@ def test_IsPrimaryShareEmulation(tradeapi, data_path):
     assert not out[0]
 
 def test_StaticSymbols(tradeapi, data_path):
-    emu = StaticSymbols(symbols=('A', 'BB'))
+    symbols=('A', 'BB')
+    emu = StaticSymbols(symbols=symbols)
 
     today = object()
     assets = ['A', 'AA', 'BB']
     out = [None, None, None]
-    emu.compute(today, assets, out)
+    emu.compute(today, assets, out, symbols)
     assert not out[1]
