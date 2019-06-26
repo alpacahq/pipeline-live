@@ -7,10 +7,10 @@ from pipeline_live.data.iex.pricing import USEquityPricing
 from .datamock import mock_iex
 
 
-def test_IEXKeyStats(iexfinance, data_path):
+def test_IEXKeyStats(refdata, stocks, data_path):
 
-    mock_iex.get_available_symbols(iexfinance)
-    mock_iex.get_key_stats(iexfinance)
+    mock_iex.get_available_symbols(refdata)
+    mock_iex.get_key_stats(stocks)
 
     marketcap = IEXKeyStats.marketcap
     loader = marketcap.dataset.get_loader()
@@ -20,9 +20,9 @@ def test_IEXKeyStats(iexfinance, data_path):
     assert out[marketcap][0][0] != 0.0
 
 
-def test_pricing_loader(iexfinance, data_path):
-    mock_iex.get_available_symbols(iexfinance)
-    mock_iex.get_chart(iexfinance)
+def test_pricing_loader(refdata, stocks, data_path):
+    mock_iex.get_available_symbols(refdata)
+    mock_iex.get_chart(stocks)
 
     loader = USEquityPricing.get_loader()
     columns = [USEquityPricing.close]

@@ -1,4 +1,4 @@
-from alpaca_trade_api.entity import Asset
+from alpaca_trade_api.entity import Asset, BarSet
 
 
 def list_assets(tradeapi):
@@ -16,6 +16,16 @@ def list_assets(tradeapi):
                'symbol': 'A',
                'tradable': True}),
     ]
+
+
+def get_barset(tradeapi):
+    tradeapi.REST().get_barset.return_value = BarSet({
+        "AA": [{"t": 1544129220,
+                "o": 172.26,
+                "h": 172.3,
+                "l": 172.16,
+                "c": 172.18,
+                "v": 3892}]})
 
 
 def list_financials(tradeapi):

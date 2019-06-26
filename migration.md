@@ -12,20 +12,22 @@ pylivetrader can run the pipeline object from this package.
 ## USEquityPricing
 The most important class to think about first is the USEquityPricing class
 and it is well covered by
-`pipeline_live.data.iex.pricing.USEquityPricing` class.
+`pipeline_live.data.alpaca.pricing.USEquityPricing` class.
 This class gets the market-wide daily price data (OHLCV) up to the
-previous day from [IEX chart API](https://iextrading.com/developer/docs/#chart).
-Depending on the requested window length from its upstream pipeline, it
-fetches different size of the data range (e.g. 3m, 1y). Again, the volume of
-this data is market-wide size, so it's safe to use this with factors such
-as AverageDollarVolume.
+previous day from [Alpaca data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/bars/).
 
 ## Factors
 In order to use many of the builtin factors with this price data loader,
-you need to use `pipeline_live.data.iex.factors` package which has
-all the builtin factor classes ported from zipline.  
+you need to use `pipeline_live.data.alpaca.factors` package which has
+all the builtin factor classes ported from zipline. Use of the Alpaca data API
+requires an Alpaca account, which you can sign up for [here](https://app.alpaca.markets/signup).
 
-For example, if you have these lines,
+Once you have an Alpaca account, you will need to store your account info
+from their dashboard as environment variables. You can find information about
+how to do so on [this documentation page](https://docs.alpaca.markets/api-documentation/how-to/).
+
+To use the Alpaca factors, import them from `pipeline_live.data.alpaca.factors`.
+For example, if you have these lines on Quantopian,
 
 ```py
 from quantopian.pipeline.factors import (
@@ -37,10 +39,10 @@ from quantopian.pipeline.data.builtin import USEquityPricing
 you can rewrite it to something like this.
 
 ```py
-from pipeline_live.data.iex.factors import (
+from pipeline_live.data.alpaca.factors import (
     AverageDollarVolume, SimpleMovingAverage,
 )
-from pipeline_live.data.iex.pricing import USEquityPricing
+from pipeline_live.data.alpaca.pricing import USEquityPricing
 ```
 
 Of course, the builtin factor classes in the original zipline are mostly
@@ -49,7 +51,7 @@ ones, they also work with this `USEquityPricing`.
 
 ```py
 from zipline.pipeline.factors import AverageDollarVolume
-from pipeline_live.data.iex.pricing import USEquityPricing
+from pipeline_live.data.alpaca.pricing import USEquityPricing
 
 dollar_volume = AverageDollarVolume(
     inputs=[USEquityPricing.close, USEquityPricing.volume],
@@ -57,18 +59,26 @@ dollar_volume = AverageDollarVolume(
 )
 ```
 
-The only difference in the factor classes in `pipeline_live.data.iex.factors`
-is that some of the classes have IEX's USEquityPricing as the default
+The only difference in the factor classes in `pipeline_live.data.alpaca.factors`
+is that some of the classes have Alpaca's USEquityPricing as the default
 inputs, so you don't need to explicitly specify it.
 
 ## Fundamentals
 The Quantopian platform allows you to retrieve various proprietary data
 sources through pipeline, including Morningstar fundamentals. While the
 intention of this pipline-live library is to add more such proprietary
-data sources, the free alternative at the moment is IEX. There are two
+data sources, the alternative at the moment is IEX. There are two
 main dataset classes are builtin in this library, `IEXCompany` and
 `IEXKeyStats`. Those both belong to the `pipeline_live.data.iex.fundamentals`
 package.
+
+Please note that, in order to use the IEX API data, you will need to sign up
+for an IEX Cloud account [here](https://iexcloud.io/cloud-login#/register/) and set your IEX Cloud token in the
+`IEX_TOKEN` environment variable. IEX limits your API messages per month. In
+order to avoid running over your message quota, please make sure that you
+filter your stock universe as much as possible before using IEX API data.
+If you wish to use IEX data to frequently filter a larger set of symbols, you
+may need to upgrade your IEX Cloud account.
 
 ### IEXCompany
 This dataset class maps the basic stock information from the

@@ -1,6 +1,14 @@
-from pipeline_live.data.sources import iex, polygon
+from pipeline_live.data.sources import alpaca, iex, polygon
 
 from .datamock import mock_iex, mock_tradeapi
+
+
+def test_alpaca(alpaca_tradeapi, data_path):
+    mock_tradeapi.list_assets(alpaca_tradeapi)
+    mock_tradeapi.get_barset(alpaca_tradeapi)
+
+    data = alpaca.get_stockprices(2)
+    assert data['AA'].iloc[0].close == 172.18
 
 
 def test_polygon(tradeapi, data_path):
@@ -17,9 +25,9 @@ def test_polygon(tradeapi, data_path):
     assert data['AA']['name'] == 'Alcoa Corp'
 
 
-def test_iex(iexfinance, data_path):
-    mock_iex.get_available_symbols(iexfinance)
-    mock_iex.get_key_stats(iexfinance)
+def test_iex(refdata, stocks, data_path):
+    mock_iex.get_available_symbols(refdata)
+    mock_iex.get_key_stats(stocks)
 
     kstats = iex.key_stats()
 
@@ -30,7 +38,7 @@ def test_iex(iexfinance, data_path):
     kstats = iex.key_stats()
     assert kstats['AA']['returnOnCapital'] is None
 
-    mock_iex.get_financials(iexfinance)
+    mock_iex.get_financials(stocks)
 
     financials = iex.financials()
     assert len(financials) == 1
@@ -39,7 +47,7 @@ def test_iex(iexfinance, data_path):
     ed = iex._ensure_dict(1, ['AA'])
     assert ed['AA'] == 1
 
-    mock_iex.get_chart(iexfinance)
+    mock_iex.get_chart(stocks)
 
     data = iex.get_stockprices()
     assert len(data) == 1

@@ -1,7 +1,7 @@
 
 
-def get_available_symbols(iexfinance):
-    iexfinance.refdata.get_symbols.return_value = [
+def get_available_symbols(refdata):
+    refdata.get_iex_symbols.return_value = [
         {
             "symbol": "A",
             "name": "AGILENT TECHNOLOGIES INC",
@@ -21,8 +21,8 @@ def get_available_symbols(iexfinance):
     ]
 
 
-def get_key_stats(iexfinance):
-    iexfinance.stocks.Stock().get_key_stats.return_value = {
+def get_key_stats(stocks):
+    stocks().get_key_stats.return_value = {
         'A': {
             'companyName': 'Agilent Technologies Inc.',
             'marketcap': 20626540000,
@@ -127,8 +127,8 @@ def get_key_stats(iexfinance):
             'day30ChangePercent': -0.12963346448540067}}
 
 
-def get_financials(iexfinance):
-    iexfinance.stocks.Stock().get_financials.return_value = {'AA': [
+def get_financials(stocks):
+    stocks().get_financials.return_value = {'AA': [
         {'reportDate': '2018-06-30',
          'grossProfit': 947000000,
          'costOfRevenue': 2632000000,
@@ -211,8 +211,8 @@ def get_financials(iexfinance):
             'operatingGainsLosses': 16000000}]}
 
 
-def get_chart(iexfinance):
-    iexfinance.stocks.Stock().get_chart.return_value = {
+def get_chart(stocks):
+    stocks().get_chart.return_value = {
         'AA': [{
             'date': '2018-08-21',
             'open': 41.88,
