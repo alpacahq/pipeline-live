@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from pipeline_live.data.sources import polygon as sources_polygon
 from pipeline_live.data.sources import iex as sources_iex
+from pipeline_live.data.sources import alpaca as sources_alpaca
 
 
 @pytest.fixture
@@ -13,9 +14,21 @@ def tradeapi():
 
 
 @pytest.fixture
-def iexfinance():
-    with patch.object(sources_iex, 'iexfinance') as iexfinance:
-        yield iexfinance
+def alpaca_tradeapi():
+    with patch.object(sources_alpaca, 'tradeapi') as tradeapi:
+        yield tradeapi
+
+
+@pytest.fixture
+def refdata():
+    with patch.object(sources_iex, 'refdata') as refdata:
+        yield refdata
+
+
+@pytest.fixture
+def stocks():
+    with patch.object(sources_iex, 'Stock') as stocks:
+        yield stocks
 
 
 @pytest.fixture

@@ -1,4 +1,5 @@
-import iexfinance
+from iexfinance import refdata
+from iexfinance.stocks import Stock
 import pandas as pd
 
 from .util import (
@@ -8,7 +9,7 @@ from .util import (
 
 def list_symbols():
     return [
-        symbol['symbol'] for symbol in iexfinance.refdata.get_symbols()
+        symbol['symbol'] for symbol in refdata.get_iex_symbols()
     ]
 
 
@@ -30,7 +31,7 @@ class IEXGetter(object):
         def _get(all_symbols):
             def fetch(symbols):
                 return _ensure_dict(
-                    getattr(iexfinance.stocks.Stock(symbols), method_name)(),
+                    getattr(Stock(symbols), method_name)(),
                     symbols
                 )
 
@@ -67,7 +68,7 @@ def _get_stockprices(symbols, chart_range='1y'):
 
     def fetch(symbols):
         charts = _ensure_dict(
-            iexfinance.stocks.Stock(symbols).get_chart(range=chart_range),
+            Stock(symbols).get_chart(range=chart_range),
             symbols
         )
         result = {}

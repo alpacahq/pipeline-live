@@ -15,11 +15,11 @@ If you are looking to use this library for your Quantopian algorithm,
 check out the [migration document](./migration.md).
 
 ## Data Sources
-This library predominantly relies on the [IEX public data API](https://iextrading.com/developer/docs/) for daily
-prices and fundamentals, but plans to connect to other data sources in
-the future. Currently supported data sources include the following.
+This library predominantly relies on the [Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/) for daily
+price data. For users with funded Alpaca brokerage accounts, several [Polygon](https://polygon.io/) fundamental
+data endpoints are supported. [IEX Cloud](https://iexcloud.io/docs/api/) data is also supported, though if too much
+data is requested, it stops being free. (See the note in the IEX section below.)
 
-- [Alpaca/Polygon](https://docs.alpaca.markets/)
 
 ## Install
 
@@ -75,8 +75,47 @@ and returns a DataFrame with the data for the current date (US/Eastern time).
 Its constructor accepts `list_symbol` function that is supposed to return the full set of
 symbols as a string list, which is used as the maximum universe inside the engine.
 
+## Alpaca Data API
+The [Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/) is currently the least-limited source of pricing data
+supported by pipeline-live. In order to use the Alpaca Data API, you'll need to
+register for an Alpaca account [here](https://app.alpaca.markets/signup) and generate API key information with
+the dashboard. Once you have your keys generated, you need to store them in
+the following environment variables:
+
+```
+APCA_API_BASE_URL
+APCA_API_KEY_ID
+APCA_API_SECRET_KEY
+```
+
+### pipeline_live.data.iex.pricing.USEquityPricing
+This class provides the basic price information retrieved from
+[Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/bars/).
+
+## Polygon Data Source API
+You will need to set an [Alpaca](https://alpaca.markets/) API key as `APCA_API_KEY_ID` to use this API.
+
+### pipeline_live.data.polygon.fundamentals.PolygonCompany
+This class provides the DataSet interface using
+[Polygon Symbol Details API](https://polygon.io/docs/#!/Meta-Data/get_v1_meta_symbols_symbol_company)
+
+### pipeline_live.data.polygon.filters.IsPrimaryShareEmulation
+Experimental. This class filteres symbols by the following
+rule to return something close to
+[IsPrimaryShare()](https://www.quantopian.com/help#quantopian_pipeline_filters_fundamentals_IsPrimaryShare) in Quantopian.
+
+- must be a US company
+- must have a valid financial data
+
 ## IEX Data Source API
-You don't have to configure anything to use these API
+To use IEX-source data, you need to sign up for an IEX Cloud account and save
+your IEX token as an environment variable called `IEX_TOKEN`.
+
+IMPORTANT NOTE: IEX data is now limited for free accounts. In order to
+avoid using more messages than you are allotted each month, please
+be sure that you are not using IEX-sourced factors too frequently
+or on too many securities. For more information about how many messages
+each method will cost, please refer to [this part](https://iexcloud.io/docs/api/#data-weighting) of the IEX Cloud documentation.
 
 ### pipeline_live.data.iex.pricing.USEquityPricing
 This class provides the basic price information retrieved from
@@ -102,18 +141,3 @@ A shortcut for `IEXCompany.sector.latest`
 
 ### pipeline_live.data.iex.classifiers.Industry()
 A shortcut for `IEXCompany.industry.latest`
-
-## Alpaca/Polygon Data Source API
-You will need to set [Alpaca](https://alpaca.markets/) API key to use these API.
-
-### pipeline_live.data.polygon.fundamentals.PolygonCompany
-This class provides the DataSet interface using
-[Polygon Symbol Details API](https://polygon.io/docs/#!/Meta-Data/get_v1_meta_symbols_symbol_company)
-
-### pipeline_live.data.polygon.filters.IsPrimaryShareEmulation
-Experimental. This class filteres symbols by the following
-rule to return something close to
-[IsPrimaryShare()](https://www.quantopian.com/help#quantopian_pipeline_filters_fundamentals_IsPrimaryShare) in Quantopian.
-
-- must be a US company
-- must have a valid financial data

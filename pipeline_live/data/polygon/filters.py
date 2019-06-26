@@ -22,6 +22,7 @@ class IsPrimaryShareEmulation(CustomFilter):
         ], dtype=bool)
         out[:] = ary
 
+
 class StaticSymbols(CustomFilter):
     inputs = ()
     window_length = 1

@@ -8,13 +8,13 @@ from zipline.pipeline import Pipeline
 from .datamock import mock_iex
 
 
-def test_engine(iexfinance, data_path):
+def test_engine(refdata, stocks, data_path):
     def list_symbols():
         return ['A', 'AA']
 
-    mock_iex.get_available_symbols(iexfinance)
-    mock_iex.get_key_stats(iexfinance)
-    mock_iex.get_chart(iexfinance)
+    mock_iex.get_available_symbols(refdata)
+    mock_iex.get_key_stats(stocks)
+    mock_iex.get_chart(stocks)
 
     eng = LivePipelineEngine(list_symbols)
     ADV = AverageDollarVolume(window_length=20,)
