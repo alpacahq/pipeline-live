@@ -88,7 +88,7 @@ APCA_API_KEY_ID
 APCA_API_SECRET_KEY
 ```
 
-### pipeline_live.data.iex.pricing.USEquityPricing
+### pipeline_live.data.alpaca.pricing.USEquityPricing
 This class provides the basic price information retrieved from
 [Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/bars/).
 
