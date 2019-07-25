@@ -9,7 +9,7 @@ from .util import (
 
 def list_symbols():
     return [
-        symbol['symbol'] for symbol in refdata.get_iex_symbols()
+        symbol['symbol'] for symbol in refdata.get_symbols()
     ]
 
 
