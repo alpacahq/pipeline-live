@@ -31,3 +31,15 @@ class IEXCompanyLoader(IEXBaseLoader):
 
     def _load(self):
         return iex.company()
+
+
+class IEXFinancialsLoader(IEXBaseLoader):
+
+    def _load(self):
+        return iex.financials()
+
+
+class IEXEarningsLoader(IEXBaseLoader):
+
+    def _load(self):
+        return iex.earnings()

@@ -44,6 +44,7 @@ class IEXGetter(object):
 key_stats = IEXGetter('key_stats')
 company = IEXGetter('company')
 financials = IEXGetter('financials')
+earnings = IEXGetter('earnings')
 
 
 def get_stockprices(chart_range='1y'):
