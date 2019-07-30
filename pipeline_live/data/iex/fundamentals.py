@@ -9,6 +9,7 @@ from .fundamentals_loader import (
     IEXKeyStatsLoader,
     IEXCompanyLoader,
     IEXFinancialsLoader,
+    IEXEarningsLoader,
 )
 
 
@@ -18,6 +19,9 @@ from .fundamentals_loader import (
 class IEXEarnings(DataSet):
 
     '''
+    While multiple earnings may be returned, the default is one. We take this earnings
+    And flatten it into a structure supported by pipeline live.
+
   {
       "symbol": "AAPL",
       "earnings": [
@@ -32,18 +36,6 @@ class IEXEarnings(DataSet):
               "fiscalEndDate": "2019-03-31",
               "yearAgo": 2.73,
               "yearAgoChangePercent": -0.0989
-          },
-          {
-              "actualEPS": 4.18,
-              "consensusEPS": 4.17,
-              "announceTime": "AMC",
-              "numberOfEstimates": 35,
-              "EPSSurpriseDollar": 0.01,
-              "EPSReportDate": "2019-01-29",
-              "fiscalPeriod": "Q4 2018",
-              "fiscalEndDate": "2018-12-31",
-              "yearAgo": 3.89,
-              "yearAgoChangePercent": 0.0746
           }
       ]
   }
@@ -65,7 +57,7 @@ class IEXEarnings(DataSet):
     yearAgo = Column(float64_dtype, missing_value=np.nan)
     yearAgoChangePercent = Column(float64_dtype, missing_value=np.nan)
 
-    _loader = IEXKeyStatsLoader()
+    _loader = IEXEarningsLoader()
 
     @classmethod
     def get_loader(cls):
