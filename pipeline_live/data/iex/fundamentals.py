@@ -1,7 +1,7 @@
 import numpy as np
 
 from zipline.utils.numpy_utils import (
-    object_dtype, datetime64D_dtype, float64_dtype,
+    object_dtype, datetime64ns_dtype, datetime64D_dtype, float64_dtype,
 )
 from zipline.pipeline.data.dataset import Column, DataSet
 
@@ -13,42 +13,29 @@ from .fundamentals_loader import (
 )
 
 
-# TODO: pull latest reported financials and flatten
-# TODO: the same applies to reporting endpoint
 
 class IEXEarnings(DataSet):
 
     '''
-    While multiple earnings may be returned, the default is one. We take this earnings
-    And flatten it into a structure supported by pipeline live.
-
-  {
-      "symbol": "AAPL",
-      "earnings": [
-          {
-              "actualEPS": 2.46,
-              "consensusEPS": 2.36,
-              "announceTime": "AMC",
-              "numberOfEstimates": 34,
-              "EPSSurpriseDollar": 0.1,
-              "EPSReportDate": "2019-04-30",
-              "fiscalPeriod": "Q1 2019",
-              "fiscalEndDate": "2019-03-31",
-              "yearAgo": 2.73,
-              "yearAgoChangePercent": -0.0989
-          }
-      ]
-  }
+        "actualEPS": 2.46,
+        "consensusEPS": 2.36,
+        "announceTime": "AMC",
+        "numberOfEstimates": 34,
+        "EPSSurpriseDollar": 0.1,
+        "EPSReportDate": "2019-04-30",
+        "fiscalPeriod": "Q1 2019",
+        "fiscalEndDate": "2019-03-31",
+        "yearAgo": 2.73,
+        "yearAgoChangePercent": -0.0989
     '''
 
-    symbol = Column(object_dtype)
-    announceTime = Column(object_dtype)
-    fiscalPeriod = Column(object_dtype)
+    announceTime = Column(object_dtype, missing_value='')
+    fiscalPeriod = Column(object_dtype, missing_value='')
     EPSReportDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     fiscalEndDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     actualEPS = Column(float64_dtype, missing_value=np.nan)
     consensusEPS = Column(float64_dtype, missing_value=np.nan)
@@ -66,10 +53,6 @@ class IEXEarnings(DataSet):
 class IEXFinancials(DataSet):
 
     '''
-  {
-    "symbol": "AAPL",
-    "financials": [
-      {
         "reportDate": "2019-03-31",
         "grossProfit": 21648000000,
         "costOfRevenue": 36270000000,
@@ -91,12 +74,8 @@ class IEXFinancials(DataSet):
         "shareholderEquity": 105860000000,
         "cashChange": -4954000000,
         "cashFlow": 11155000000
-      } // , { ... }
-    ]
-  }
     '''
 
-    symbol = Column(object_dtype, missing_value='')
     reportDate = Column(float64_dtype, missing_value=np.nan)
     grossProfit = Column(float64_dtype, missing_value=np.nan)
     costOfRevenue = Column(float64_dtype, missing_value=np.nan)
@@ -186,16 +165,16 @@ class IEXKeyStats(DataSet):
     week52change = Column(float64_dtype, missing_value=np.nan)
     shortInterest = Column(float64_dtype, missing_value=np.nan)
     shortDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     dividendRate = Column(float64_dtype, missing_value=np.nan)
     dividendYield = Column(float64_dtype, missing_value=np.nan)
     exDividendDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     latestEPS = Column(float64_dtype, missing_value=np.nan)
     latestEPSDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     sharesOutstanding = Column(float64_dtype, missing_value=np.nan)
     float = Column(float64_dtype, missing_value=np.nan)
