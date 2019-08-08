@@ -1,11 +1,108 @@
 import numpy as np
 
 from zipline.utils.numpy_utils import (
-    object_dtype, datetime64D_dtype, float64_dtype,
+    object_dtype, datetime64ns_dtype, datetime64D_dtype, float64_dtype,
 )
 from zipline.pipeline.data.dataset import Column, DataSet
 
-from .fundamentals_loader import IEXKeyStatsLoader, IEXCompanyLoader
+from .fundamentals_loader import (
+    IEXKeyStatsLoader,
+    IEXCompanyLoader,
+    IEXFinancialsLoader,
+    IEXEarningsLoader,
+)
+
+
+
+class IEXEarnings(DataSet):
+
+    '''
+        "actualEPS": 2.46,
+        "consensusEPS": 2.36,
+        "announceTime": "AMC",
+        "numberOfEstimates": 34,
+        "EPSSurpriseDollar": 0.1,
+        "EPSReportDate": "2019-04-30",
+        "fiscalPeriod": "Q1 2019",
+        "fiscalEndDate": "2019-03-31",
+        "yearAgo": 2.73,
+        "yearAgoChangePercent": -0.0989
+    '''
+
+    announceTime = Column(object_dtype, missing_value='')
+    fiscalPeriod = Column(object_dtype, missing_value='')
+    EPSReportDate = Column(
+        datetime64ns_dtype,
+        missing_value=np.datetime64('1970-01-01'))
+    fiscalEndDate = Column(
+        datetime64ns_dtype,
+        missing_value=np.datetime64('1970-01-01'))
+    actualEPS = Column(float64_dtype, missing_value=np.nan)
+    consensusEPS = Column(float64_dtype, missing_value=np.nan)
+    numberOfEstimates = Column(float64_dtype, missing_value=np.nan)
+    EPSSurpriseDollar = Column(float64_dtype, missing_value=np.nan)
+    yearAgo = Column(float64_dtype, missing_value=np.nan)
+    yearAgoChangePercent = Column(float64_dtype, missing_value=np.nan)
+
+    _loader = IEXEarningsLoader()
+
+    @classmethod
+    def get_loader(cls):
+        return cls._loader
+
+class IEXFinancials(DataSet):
+
+    '''
+        "reportDate": "2019-03-31",
+        "grossProfit": 21648000000,
+        "costOfRevenue": 36270000000,
+        "operatingRevenue": 57918000000,
+        "totalRevenue": 57918000000,
+        "operatingIncome": 13242000000,
+        "netIncome": 11561000000,
+        "researchAndDevelopment": 3948000000,
+        "operatingExpense": 44676000000,
+        "currentAssets": 123346000000,
+        "totalAssets": 341998000000,
+        "totalLiabilities": 236138000000,
+        "currentCash": 38329000000,
+        "currentDebt": 22429000000,
+        "shortTermDebt": 22429000000,
+        "longTermDebt": 90201000000,
+        "totalCash": 80433000000,
+        "totalDebt": 112630000000,
+        "shareholderEquity": 105860000000,
+        "cashChange": -4954000000,
+        "cashFlow": 11155000000
+    '''
+
+    reportDate = Column(float64_dtype, missing_value=np.nan)
+    grossProfit = Column(float64_dtype, missing_value=np.nan)
+    costOfRevenue = Column(float64_dtype, missing_value=np.nan)
+    operatingRevenue = Column(float64_dtype, missing_value=np.nan)
+    totalRevenue = Column(float64_dtype, missing_value=np.nan)
+    operatingIncome = Column(float64_dtype, missing_value=np.nan)
+    netIncome = Column(float64_dtype, missing_value=np.nan)
+    researchAndDevelopment = Column(float64_dtype, missing_value=np.nan)
+    operatingExpense = Column(float64_dtype, missing_value=np.nan)
+    currentAssets = Column(float64_dtype, missing_value=np.nan)
+    totalAssets = Column(float64_dtype, missing_value=np.nan)
+    totalLiabilities = Column(float64_dtype, missing_value=np.nan)
+    currentCash = Column(float64_dtype, missing_value=np.nan)
+    currentDebt = Column(float64_dtype, missing_value=np.nan)
+    shortTermDebt = Column(float64_dtype, missing_value=np.nan)
+    longTermDebt = Column(float64_dtype, missing_value=np.nan)
+    totalCash = Column(float64_dtype, missing_value=np.nan)
+    totalDebt = Column(float64_dtype, missing_value=np.nan)
+    shareholderEquity = Column(float64_dtype, missing_value=np.nan)
+    cashChange = Column(float64_dtype, missing_value=np.nan)
+    cashFlow = Column(float64_dtype, missing_value=np.nan)
+
+    _loader = IEXFinancialsLoader()
+
+    @classmethod
+    def get_loader(cls):
+        return cls._loader
 
 
 class IEXKeyStats(DataSet):
@@ -68,16 +165,16 @@ class IEXKeyStats(DataSet):
     week52change = Column(float64_dtype, missing_value=np.nan)
     shortInterest = Column(float64_dtype, missing_value=np.nan)
     shortDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     dividendRate = Column(float64_dtype, missing_value=np.nan)
     dividendYield = Column(float64_dtype, missing_value=np.nan)
     exDividendDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     latestEPS = Column(float64_dtype, missing_value=np.nan)
     latestEPSDate = Column(
-        datetime64D_dtype,
+        datetime64ns_dtype,
         missing_value=np.datetime64('1970-01-01'))
     sharesOutstanding = Column(float64_dtype, missing_value=np.nan)
     float = Column(float64_dtype, missing_value=np.nan)
@@ -93,8 +190,7 @@ class IEXKeyStats(DataSet):
     ttmEPS = Column(float64_dtype, missing_value=np.nan)
     revenuePerShare = Column(float64_dtype, missing_value=np.nan)
     revenuePerEmployee = Column(float64_dtype, missing_value=np.nan)
-    peRatioHigh = Column(float64_dtype, missing_value=np.nan)
-    peRatioLow = Column(float64_dtype, missing_value=np.nan)
+    peRatio = Column(float64_dtype, missing_value=np.nan)
     EPSSurpriseDollar = Column(float64_dtype, missing_value=np.nan)
     EPSSurprisePercent = Column(float64_dtype, missing_value=np.nan)
     returnOnAssets = Column(float64_dtype, missing_value=np.nan)
