@@ -1,7 +1,7 @@
 
 
 def get_available_symbols(refdata):
-    refdata.get_iex_symbols.return_value = [
+    refdata.get_symbols.return_value = [
         {
             "symbol": "A",
             "name": "AGILENT TECHNOLOGIES INC",
