@@ -1,5 +1,5 @@
 '''
-Duplicate builtin factor classes in zipline with IEX's USEquityPricing
+Duplicate builtin factor classes in zipline with Alpaca's USEquityPricing
 '''
 
 from zipline.pipeline.data import USEquityPricing as z_pricing
