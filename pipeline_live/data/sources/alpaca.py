@@ -6,11 +6,11 @@ from .util import (
 
 
 def list_symbols():
-    with tradeapi.REST() as api:
-        return [
-            a.symbol for a in api.list_assets()
-            if a.tradable and a.status == 'active'
-        ]
+    api = tradeapi.REST()
+    return [
+        a.symbol for a in api.list_assets()
+        if a.tradable and a.status == 'active'
+    ]
 
 
 def get_stockprices(limit=365, timespan='day'):
@@ -41,5 +41,4 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
 
         return data
 
-    with api:
-        return parallelize(fetch, splitlen=199)(symbols)
+    return parallelize(fetch, splitlen=199)(symbols)
