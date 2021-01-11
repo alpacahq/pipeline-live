@@ -6,8 +6,9 @@ from .util import (
 
 
 def list_symbols():
+    api = tradeapi.REST()
     return [
-        a.symbol for a in tradeapi.REST().list_assets()
+        a.symbol for a in api.list_assets()
         if a.tradable and a.status == 'active'
     ]
 
@@ -27,8 +28,10 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
     Just deal with Alpaca's 200 stocks per request limit.
     '''
 
+    api = tradeapi.REST()
+
     def fetch(symbols):
-        barset = tradeapi.REST().get_barset(symbols, timespan, limit)
+        barset = api.get_barset(symbols, timespan, limit)
         data = {}
         for symbol in barset:
             df = barset[symbol].df
