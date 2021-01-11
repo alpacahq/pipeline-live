@@ -25,10 +25,11 @@ setup(
     keywords='financial,zipline,pipeline,stock,screening,api,trade',
     packages=find_packages(),
     install_requires=[
+        'pandas==0.22.0',
+        'numpy==1.18.4',
         'alpaca-trade-api>=0.29',
         'iexfinance>=0.4.1,<0.5.0',
         'zipline==1.3.0',
-        'numpy',
     ],
     tests_require=[
         'pytest',
