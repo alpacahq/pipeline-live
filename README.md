@@ -39,7 +39,7 @@ from pipeline_live.engine import LivePipelineEngine
 from pipeline_live.data.sources.iex import list_symbols
 from pipeline_live.data.alpaca.pricing import USEquityPricing
 from pipeline_live.data.polygon.fundamentals import PolygonCompany
-from pipeline_live.data.iex.factors import AverageDollarVolume
+from pipeline_live.data.alpaca.factors import AverageDollarVolume
 from zipline.pipeline import Pipeline
 
 eng = LivePipelineEngine(list_symbols)

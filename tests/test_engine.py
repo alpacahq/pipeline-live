@@ -3,7 +3,7 @@ import pytest
 from pipeline_live.engine import LivePipelineEngine
 from pipeline_live.data.iex.pricing import USEquityPricing
 from pipeline_live.data.iex.classifiers import Sector
-# from pipeline_live.data.iex.factors import AverageDollarVolume
+
 from pipeline_live.data.alpaca.factors import AverageDollarVolume
 from zipline.pipeline import Pipeline
 
