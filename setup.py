@@ -27,7 +27,7 @@ setup(
     install_requires=[
         'pandas==0.22.0',
         'numpy==1.18.4',
-        'alpaca-trade-api>=0.29',
+        'alpaca-trade-api>=0.51.0',
         'iexfinance>=0.4.1,<0.5.0',
         'zipline==1.3.0',
     ],
