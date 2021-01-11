@@ -26,7 +26,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pandas==0.22.0',
-        'numpy==1.18.4',
+        'numpy==1.19.4',
+        'scipy<=1.6.0',
         'alpaca-trade-api>=0.51.0',
         'iexfinance>=0.4.1,<0.5.0',
         'zipline==1.3.0',
