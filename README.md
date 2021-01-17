@@ -33,10 +33,23 @@ This module is tested and expected to work with python 3.6 and later
 
 ## Example
 Here is a simple pipeline example.
+Please make sure to first set your API keys to these environment variables:
 
+using python
+```py
+import os
+os.environ["APCA_API_KEY_ID"] = <ALPACA_API_KEY>
+os.environ["APCA_API_SECRET_KEY"] = <ALPACA_SECRET_KEY>
+# if you use the paper endpoint:
+os.environ["APCA_API_BASE_URL"] = "https://paper-api.alpaca.markets"
+```
+
+(or do it with bash if you prefer)
+
+Please note that using polygon is only available for funded accounts:
 ```py
 from pipeline_live.engine import LivePipelineEngine
-from pipeline_live.data.sources.iex import list_symbols
+from pipeline_live.data.sources.alpaca import list_symbols
 from pipeline_live.data.alpaca.pricing import USEquityPricing
 from pipeline_live.data.polygon.fundamentals import PolygonCompany
 from pipeline_live.data.alpaca.factors import AverageDollarVolume
@@ -58,6 +71,33 @@ AMZN  1902.90  9.293372e+11
 FB     172.90  5.042383e+11
 QQQ    180.80  7.092998e+10
 SPY    285.79  2.737475e+11
+'''
+```
+
+This will work (with limited functionality) for non-funded accounts:
+
+```py
+from pipeline_live.engine import LivePipelineEngine
+from pipeline_live.data.sources.alpaca import list_symbols
+from pipeline_live.data.alpaca.pricing import USEquityPricing
+from pipeline_live.data.alpaca.factors import AverageDollarVolume
+from zipline.pipeline import Pipeline
+
+eng = LivePipelineEngine(list_symbols)
+top5 = AverageDollarVolume(window_length=20).top(5)
+pipe = Pipeline({
+    'close': USEquityPricing.close.latest,
+}, screen=top5)
+
+df = eng.run_pipeline(pipe)
+
+'''
+        close
+AAPL   215.49
+AMZN  1902.90
+FB     172.90
+QQQ    180.80
+SPY    285.79
 '''
 ```
 
