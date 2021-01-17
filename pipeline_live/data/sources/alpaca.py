@@ -7,11 +7,7 @@ from .util import (
 
 def list_symbols():
     api = tradeapi.REST()
-    return [
-        a.symbol for a in api.list_assets()
-        if a.tradable and a.status == 'active'
-    ]
-
+    return [a.symbol for a in api.list_assets(status="active") if a.tradable]
 
 def get_stockprices(limit=365, timespan='day'):
     all_symbols = list_symbols()
