@@ -3,4 +3,8 @@ from pipeline_live.data.iex.pricing import USEquityPricing
 
 
 def test_factors():
-    assert factors.AverageDollarVolume.inputs[0] == USEquityPricing.close
+    factor = factors.AverageDollarVolume(
+        window_length=30,
+        inputs=[USEquityPricing.close, USEquityPricing.volume])
+
+    assert factor.inputs[0] == USEquityPricing.close
