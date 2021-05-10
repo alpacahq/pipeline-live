@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6]
+        python-version: [3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -23,11 +23,22 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Install TA-Lib
+      run: |
+        # Insatll talib
+        cd /tmp && \
+        curl -L https://downloads.sourceforge.net/project/ta-lib/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz | \
+        tar xvz && \
+        cd /tmp/ta-lib && \
+        ./configure --prefix=/usr && \
+        make && \
+        sudo make install
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
-        pip install pandas==0.22.0 numpy==1.19.4 scipy==1.5.4 pandas-datareader==0.8.1
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python setup.py install
     - name: Lint with flake8
