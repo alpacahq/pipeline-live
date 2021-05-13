@@ -29,7 +29,7 @@ setup(
         'lxml>=4.6.2',
         'alpaca-trade-api>=0.52.0',
         'iexfinance>=0.4.1,<0.5.0',
-        'zipline-reloaded',
+        'zipline-reloaded>=2',
     ],
     tests_require=[
         'pytest',
