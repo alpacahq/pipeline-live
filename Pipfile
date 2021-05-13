@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 alpaca-trade-api = ">=0.37"
 iexfinance = ">=0.4.1"
-zipline = "==1.3.0"
+zipline-reloaded = "*"
 numpy = "*"
 
 [dev-packages]
@@ -15,4 +15,4 @@ pytest-cov = "*"
 flake8 = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"

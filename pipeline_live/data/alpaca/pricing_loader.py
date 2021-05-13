@@ -1,6 +1,7 @@
 import numpy as np
 import logbook
 import pandas as pd
+from interface import implements
 
 from zipline.lib.adjusted_array import AdjustedArray
 from zipline.pipeline.loaders.base import PipelineLoader
@@ -13,17 +14,16 @@ from pipeline_live.data.sources import alpaca
 log = logbook.Logger(__name__)
 
 
-class USEquityPricingLoader(PipelineLoader):
+class USEquityPricingLoader(implements(PipelineLoader)):
     """
     PipelineLoader for US Equity Pricing data
     """
 
     def __init__(self):
         cal = get_calendar('NYSE')
-
         self._all_sessions = cal.all_sessions
 
-    def load_adjusted_array(self, columns, dates, symbols, mask):
+    def load_adjusted_array(self, domain, columns, dates, sids, mask):
         # load_adjusted_array is called with dates on which the user's algo
         # will be shown data, which means we need to return the data that would
         # be known at the start of each date.  We assume that the latest data
@@ -42,7 +42,7 @@ class USEquityPricingLoader(PipelineLoader):
         prices = alpaca.get_stockprices(chart_range)
 
         dfs = []
-        for symbol in symbols:
+        for symbol in sids:
             if symbol not in prices:
                 df = pd.DataFrame(
                     {c.name: c.missing_value for c in columns},
