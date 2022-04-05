@@ -1,4 +1,5 @@
 import alpaca_trade_api as tradeapi
+from alpaca_trade_api import TimeFrame
 
 from .util import (
     daily_cache, parallelize
@@ -25,14 +26,25 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
     '''
 
     api = tradeapi.REST()
+    timeframe = TimeFrame.Minute if timespan == "minute" else TimeFrame.Day
 
     def fetch(symbols):
-        barset = api.get_barset(symbols, timespan, limit)
+        # Using V2 api to get the data. we cannot do 1 api call for all
+        # symbols because the v1 `limit` was per symbol, where v2 it's for
+        # overall response size; so we will iterate over each symbol with
+        # the limit for each to replicate that behaviour
+
         data = {}
-        for symbol in barset:
-            df = barset[symbol].df
+        for symbol in symbols:
+            df = api.get_bars(symbol,
+                              limit=limit,
+                              timeframe=timeframe,
+                              adjustment='raw').df
+
             # Update the index format for comparison with the trading calendar
-            df.index = df.index.tz_convert('UTC').normalize()
+            if df.index.tzinfo is None:
+                df.index = df.index.tz_localize('UTC')
+
             data[symbol] = df.asfreq('C')
 
         return data

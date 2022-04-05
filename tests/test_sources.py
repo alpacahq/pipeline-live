@@ -8,7 +8,7 @@ def test_alpaca(alpaca_tradeapi, data_path):
     mock_tradeapi.get_barset(alpaca_tradeapi)
 
     data = alpaca.get_stockprices(2)
-    assert data['AA'].iloc[0].close == 172.18
+    assert data['AA'].iloc[0].close == 165.28
 
 
 def test_polygon(tradeapi, data_path):
