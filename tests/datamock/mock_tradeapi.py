@@ -19,7 +19,7 @@ def list_assets(tradeapi):
     ]
 
 
-def get_barset(tradeapi):
+def get_bars(tradeapi):
     tradeapi.REST().get_bars.return_value = BarsV2([
             {
                 's': 'AA',

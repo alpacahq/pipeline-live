@@ -29,11 +29,6 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
     timeframe = TimeFrame.Minute if timespan == "minute" else TimeFrame.Day
 
     def fetch(symbols):
-        # Using V2 api to get the data. we cannot do 1 api call for all
-        # symbols because the v1 `limit` was per symbol, where v2 it's for
-        # overall response size; so we will iterate over each symbol with
-        # the limit for each to replicate that behaviour
-
         data = {}
         for symbol in symbols:
             df = api.get_bars(symbol,
@@ -42,7 +37,7 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
                               adjustment='raw').df
 
             # Update the index format for comparison with the trading calendar
-            if df.index.tzinfo is None:
+            if not df.empty and df.index.tzinfo is None:
                 df.index = df.index.tz_localize('UTC')
 
             data[symbol] = df.asfreq('C')

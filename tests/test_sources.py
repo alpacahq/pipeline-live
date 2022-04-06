@@ -5,24 +5,10 @@ from .datamock import mock_iex, mock_tradeapi
 
 def test_alpaca(alpaca_tradeapi, data_path):
     mock_tradeapi.list_assets(alpaca_tradeapi)
-    mock_tradeapi.get_barset(alpaca_tradeapi)
+    mock_tradeapi.get_bars(alpaca_tradeapi)
 
     data = alpaca.get_stockprices(2)
     assert data['AA'].iloc[0].close == 165.28
-
-
-def test_polygon(tradeapi, data_path):
-    mock_tradeapi.list_assets(tradeapi)
-    mock_tradeapi.list_financials(tradeapi)
-
-    data = polygon.financials()
-    assert len(data['AA']) == 5
-    assert data['AA'][-1]['totalCash'] > 10e7
-
-    mock_tradeapi.list_companies(tradeapi)
-    data = polygon.company()
-    assert len(data) == 2
-    assert data['AA']['name'] == 'Alcoa Corp'
 
 
 def test_iex(refdata, stocks, data_path):

@@ -7,7 +7,7 @@ from pipeline_live.data.alpaca.pricing import USEquityPricing
 
 def test_pricing_loader(refdata, alpaca_tradeapi, data_path):
     mock_tradeapi.list_assets(alpaca_tradeapi)
-    mock_tradeapi.get_barset(alpaca_tradeapi)
+    mock_tradeapi.get_bars(alpaca_tradeapi)
 
     loader = USEquityPricing.get_loader()
     columns = [USEquityPricing.close]
