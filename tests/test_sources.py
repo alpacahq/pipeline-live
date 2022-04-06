@@ -1,4 +1,4 @@
-from pipeline_live.data.sources import alpaca, iex, polygon
+from pipeline_live.data.sources import alpaca, iex
 
 from .datamock import mock_iex, mock_tradeapi
 

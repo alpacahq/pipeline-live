@@ -2,15 +2,8 @@ import pytest
 import tempfile
 from unittest.mock import patch
 
-from pipeline_live.data.sources import polygon as sources_polygon
 from pipeline_live.data.sources import iex as sources_iex
 from pipeline_live.data.sources import alpaca as sources_alpaca
-
-
-@pytest.fixture
-def tradeapi():
-    with patch.object(sources_polygon, 'tradeapi') as tradeapi:
-        yield tradeapi
 
 
 @pytest.fixture

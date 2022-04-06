@@ -16,8 +16,7 @@ check out the [migration document](./migration.md).
 
 ## Data Sources
 This library predominantly relies on the [Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/) for daily
-price data. For users with funded Alpaca brokerage accounts, several [Polygon](https://polygon.io/) fundamental
-data endpoints are supported. [IEX Cloud](https://iexcloud.io/docs/api/) data is also supported, though if too much
+price data. [IEX Cloud](https://iexcloud.io/docs/api/) data is also supported, though if too much
 data is requested, it stops being free. (See the note in the IEX section below.)
 
 
@@ -45,36 +44,6 @@ os.environ["APCA_API_BASE_URL"] = "https://paper-api.alpaca.markets"
 ```
 
 (or do it with bash if you prefer)
-
-Please note that using polygon is only available for funded accounts:
-```py
-from pipeline_live.engine import LivePipelineEngine
-from pipeline_live.data.sources.alpaca import list_symbols
-from pipeline_live.data.alpaca.pricing import USEquityPricing
-from pipeline_live.data.polygon.fundamentals import PolygonCompany
-from pipeline_live.data.alpaca.factors import AverageDollarVolume
-from zipline.pipeline import Pipeline
-
-eng = LivePipelineEngine(list_symbols)
-top5 = AverageDollarVolume(window_length=20).top(5)
-pipe = Pipeline({
-    'close': USEquityPricing.close.latest,
-    'marketcap': PolygonCompany.marketcap.latest,
-}, screen=top5)
-
-df = eng.run_pipeline(pipe)
-
-'''
-        close     marketcap
-AAPL   215.49  1.044037e+12
-AMZN  1902.90  9.293372e+11
-FB     172.90  5.042383e+11
-QQQ    180.80  7.092998e+10
-SPY    285.79  2.737475e+11
-'''
-```
-
-This will work (with limited functionality) for non-funded accounts:
 
 ```py
 from pipeline_live.engine import LivePipelineEngine
@@ -132,20 +101,9 @@ APCA_API_SECRET_KEY
 This class provides the basic price information retrieved from
 [Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/bars/).
 
-## Polygon Data Source API
-You will need to set an [Alpaca](https://alpaca.markets/) API key as `APCA_API_KEY_ID` to use this API.
-
-### pipeline_live.data.polygon.fundamentals.PolygonCompany
-This class provides the DataSet interface using
-[Polygon Symbol Details API](https://polygon.io/docs/#!/Meta-Data/get_v1_meta_symbols_symbol_company)
-
-### pipeline_live.data.polygon.filters.IsPrimaryShareEmulation
-Experimental. This class filteres symbols by the following
-rule to return something close to
-[IsPrimaryShare()](https://www.quantopian.com/help#quantopian_pipeline_filters_fundamentals_IsPrimaryShare) in Quantopian.
-
-- must be a US company
-- must have a valid financial data
+## Where Did the Polygon integration go?
+Alpaca used to offer an integration with polygon, however with the removal of 
+that integration from the Alpaca api we removed the polygon integration here as well.
 
 ## IEX Data Source API
 To use IEX-source data, you need to sign up for an IEX Cloud account and save
