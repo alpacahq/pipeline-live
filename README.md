@@ -1,4 +1,18 @@
-# Zipline Pipeline Extension for Live Trading
+# ⚠️ This is software is very outdated and is not recommended for use in new setups ⚠️
+
+We will keep this project up and with the documentation for the parts that remain
+for those users who are still using this, but we suggest migrating to another tool
+until we perform a major refactoring of this project to bring it up to speed. If this
+is something you'd like to see please reach out to us to let us know!
+
+The docs below still talk about zipline and Quantopian however Quantopian has since
+gone out of business and the below hasn't yet been updated to reflect this.
+
+If you're looking for another modern alternative to zipline, we recommend checking
+out [zipline-reloaded](https://github.com/stefan-jansen/zipline-reloaded) in the meantime
+while we review committing to a major refactor of this project.
+
+## Zipline Pipeline Extension for Live Trading
 `pipeline-live` is an extension for zipline pipeline independently usable
 for live trading, outside of zipline. While zipline is a great backtesting
 library, the default Pipeline API requires complicated setup for data bundle,
@@ -102,7 +116,7 @@ This class provides the basic price information retrieved from
 [Alpaca Data API](https://docs.alpaca.markets/api-documentation/api-v2/market-data/bars/).
 
 ## Where Did the Polygon integration go?
-Alpaca used to offer an integration with polygon, however with the removal of 
+Alpaca used to offer an integration with polygon, however with the removal of
 that integration from the Alpaca api we removed the polygon integration here as well.
 
 ## IEX Data Source API
