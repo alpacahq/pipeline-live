@@ -1,3 +1,4 @@
+from datetime import timedelta
 from alpaca_trade_api import TimeFrame, REST
 
 from .util import (
@@ -26,18 +27,31 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
 
     api = REST()
     timeframe = TimeFrame.Minute if timespan == "minute" else TimeFrame.Day
+    start = None
+
+    #If we need days we need to go back limit days, v1 used to handle this by itself
+    if timespan != 'minute':
+        start = api.get_clock().timestamp.date() - timedelta(days=limit)
 
     def fetch(symbols):
         data = {}
         for symbol in symbols:
-            df = api.get_bars(symbol,
-                              limit=limit,
-                              timeframe=timeframe,
-                              adjustment='raw').df
+            df = api.get_bars(
+                symbol,
+                start=start,
+                limit=limit,
+                timeframe=timeframe,
+                adjustment='raw'
+            ).df
 
             # Update the index format for comparison with the trading calendar
-            if not df.empty and df.index.tzinfo is None:
-                df.index = df.index.tz_localize('UTC')
+            if not df.empty:
+                if df.index.tzinfo is None:
+                    df.index = df.index\
+                        .tz_localize('UTC')\
+                        .tz_convert('US/Eastern')
+                else:
+                    df.index = df.index.tz_convert('US/Eastern')
 
             data[symbol] = df.asfreq('C')
 
