@@ -49,9 +49,9 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
                 if df.index.tzinfo is None:
                     df.index = df.index\
                         .tz_localize('UTC')\
-                        .tz_convert('US/Eastern')
+                        .tz_convert('US/Eastern').normalize()
                 else:
-                    df.index = df.index.tz_convert('US/Eastern')
+                    df.index = df.index.tz_convert('US/Eastern').normalize()
 
             data[symbol] = df.asfreq('C')
 
