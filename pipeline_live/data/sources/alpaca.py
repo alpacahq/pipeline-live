@@ -1,5 +1,4 @@
-import alpaca_trade_api as tradeapi
-from alpaca_trade_api import TimeFrame
+from alpaca_trade_api import TimeFrame, REST
 
 from .util import (
     daily_cache, parallelize
@@ -7,7 +6,7 @@ from .util import (
 
 
 def list_symbols():
-    api = tradeapi.REST()
+    api = REST()
     return [a.symbol for a in api.list_assets(status="active") if a.tradable]
 
 def get_stockprices(limit=365, timespan='day'):
@@ -25,7 +24,7 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
     Just deal with Alpaca's 200 stocks per request limit.
     '''
 
-    api = tradeapi.REST()
+    api = REST()
     timeframe = TimeFrame.Minute if timespan == "minute" else TimeFrame.Day
 
     def fetch(symbols):

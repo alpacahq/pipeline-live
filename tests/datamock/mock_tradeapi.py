@@ -1,5 +1,5 @@
-from alpaca_trade_api.entity import Asset, BarSet
-from alpaca_trade_api.entity_v2 import BarsV2, Bar
+from alpaca_trade_api.entity import Asset
+from alpaca_trade_api.entity_v2 import BarsV2
 
 
 def list_assets(tradeapi):
