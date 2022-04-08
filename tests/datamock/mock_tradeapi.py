@@ -3,7 +3,7 @@ from alpaca_trade_api.entity_v2 import BarsV2
 
 
 def list_assets(tradeapi):
-    tradeapi.REST().list_assets.return_value = [
+    tradeapi().list_assets.return_value = [
         Asset({'asset_class': 'us_equity',
                'exchange': 'NYSE',
                'id': '3ca0202f-01f4-41a0-bb0c-c8864e767ebd',
@@ -20,7 +20,7 @@ def list_assets(tradeapi):
 
 
 def get_bars(tradeapi):
-    tradeapi.REST().get_bars.return_value = BarsV2([
+    tradeapi().get_bars.return_value = BarsV2([
             {
                 's': 'AA',
                 "t": "2022-02-28T05:00:00Z",

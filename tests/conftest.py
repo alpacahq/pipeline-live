@@ -8,7 +8,7 @@ from pipeline_live.data.sources import alpaca as sources_alpaca
 
 @pytest.fixture
 def alpaca_tradeapi():
-    with patch.object(sources_alpaca, 'tradeapi') as tradeapi:
+    with patch.object(sources_alpaca, 'REST') as tradeapi:
         yield tradeapi
 
 
