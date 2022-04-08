@@ -53,7 +53,8 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
                 else:
                     df.index = df.index.tz_convert('US/Eastern').normalize()
 
-            data[symbol] = df.asfreq('C')
+
+            data[symbol] = df.asfreq('C') if timeframe != 'minute' else df
 
         return data
 
