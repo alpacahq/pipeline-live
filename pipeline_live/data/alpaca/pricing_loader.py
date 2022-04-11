@@ -56,9 +56,20 @@ class USEquityPricingLoader(PipelineLoader):
         raw_arrays = {}
         for c in columns:
             colname = c.name
-            raw_arrays[colname] = np.stack([
-                df[colname].values for df in dfs
-            ], axis=-1)
+            parsed_values = []
+            for df in dfs:
+                if not df.empty:
+                    value = df[colname].values
+                else:
+                    value = np.empty(shape=(len(sessions)))
+                    value.fill(np.nan)
+
+                parsed_values.append(value)
+
+            raw_arrays[colname] = np.stack(
+                parsed_values,
+                axis=-1
+            )
         out = {}
         for c in columns:
             c_raw = raw_arrays[c.name]
