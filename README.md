@@ -1,4 +1,4 @@
-# ⚠️ This is software is very outdated and is not recommended for use in new setups ⚠️
+# ⚠️ This software is very outdated and is not recommended for use in new setups ⚠️
 
 We will keep this project up and with the documentation for the parts that remain
 for those users who are still using this, but we suggest migrating to another tool
