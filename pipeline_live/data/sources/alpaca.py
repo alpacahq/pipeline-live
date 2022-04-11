@@ -29,8 +29,10 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
     timeframe = TimeFrame.Minute if timespan == "minute" else TimeFrame.Day
     start = None
 
-    #If we need days we need to go back limit days, v1 used to handle this by itself
-    if timespan != 'minute':
+    #Data v1 used to handle this itself, so we have to do it manually now
+    if timespan == 'minute':
+        start = api.get_clock().timestamp.date() - timedelta(minutes=limit)
+    else:
         start = api.get_clock().timestamp.date() - timedelta(days=limit)
 
     def fetch(symbols):
@@ -49,9 +51,9 @@ def _get_stockprices(symbols, limit=365, timespan='day'):
                 if df.index.tzinfo is None:
                     df.index = df.index\
                         .tz_localize('UTC')\
-                        .tz_convert('US/Eastern').normalize()
+                        .tz_convert('US/Eastern')
                 else:
-                    df.index = df.index.tz_convert('US/Eastern').normalize()
+                    df.index = df.index.tz_convert('US/Eastern')
 
 
             data[symbol] = df.asfreq('C') if timeframe != 'minute' else df
