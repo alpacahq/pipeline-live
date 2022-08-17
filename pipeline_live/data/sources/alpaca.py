@@ -8,7 +8,7 @@ from .util import (
 
 def list_symbols():
     api = REST()
-    return [a.symbol for a in api.list_assets(status="active") if a.tradable]
+    return [a.symbol for a in api.list_assets(status="active", asset_class ="us_equity") if a.tradable]
 
 def get_stockprices(limit=365, timespan='day'):
     all_symbols = list_symbols()
